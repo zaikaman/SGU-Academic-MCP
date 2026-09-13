@@ -1,132 +1,150 @@
 # SGU Academic MCP Server 🎓🤖
 
-> **Đề tài:** Tìm hiểu MCP SDK và hiện thực MCP Server hỗ trợ tra cứu tiện ích học vụ SGU cho trợ lý AI  
-> **Môn học:** Các Công nghệ Lập trình Hiện đại (CCNLTHD)  
-> **Track:** AI / Data  
-> **Công nghệ chính (Phần A4):** `MCP SDK` (Model Context Protocol Python SDK v2.x)  
-> **Hồ sơ đề tài (Phần B1):** `MCP Server`  
-> **Đơn vị áp dụng:** Trường Đại học Sài Gòn (SGU) — Cổng thông tin đào tạo `thongtindaotao.sgu.edu.vn`
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Model Context Protocol](https://img.shields.io/badge/MCP-Protocol-purple.svg)](https://modelcontextprotocol.io/)
+[![Tests](https://img.shields.io/badge/tests-12%20passed-brightgreen.svg)](tests/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+> A production-grade **Model Context Protocol (MCP)** Server bridging AI Assistants (Claude Desktop, Antigravity, Cursor) directly with the **Saigon University (SGU) Academic Portal** (`thongtindaotao.sgu.edu.vn`).
 
 ---
 
-## 📖 1. Giới thiệu tổng quan
+## 📖 Giới thiệu
 
-Dự án hiện thực một **MCP Server** theo chuẩn mở **Model Context Protocol (MCP)** do Anthropic khởi xướng. Hệ thống đóng vai trò cầu nối trung gian (Middleware Bridge), cho phép các Trợ lý Trí tuệ Nhân tạo hiện đại (Claude Desktop, Cursor IDE, Custom Chatbots) kết nối trực tiếp với **Cổng thông tin đào tạo trường Đại học Sài Gòn (SGU)** để tra cứu và thực thi các nghiệp vụ học vụ thông minh bằng ngôn ngữ tự nhiên.
+**SGU Academic MCP Server** được xây dựng theo chuẩn mở [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) của Anthropic. Hệ thống đóng vai trò cầu nối thông minh (Bridge Middleware), giúp các Trợ lý AI có thể tương tác trực tiếp với dữ liệu học tập thực tế từ cổng thông tin đào tạo Đại học Sài Gòn (SGU) bằng ngôn ngữ tự nhiên.
 
-### ✨ Các điểm nổi bật:
-* **Dữ liệu thật 100% (Real Data):** Kết nối trực tiếp vào REST API chính thức của SGU (`thongtindaotao.sgu.edu.vn`).
-* **Bảo mật hai lớp:** Tự động tạo header mã hóa `ua` (User-Agent dynamic XOR encryption) để vượt qua cơ chế chống bot của trường và bảo vệ token sinh viên trong môi trường cục bộ.
-* **Bộ nhớ đệm thông minh (SQLite Caching):** Tự động cache dữ liệu học kỳ vào database SQLite cục bộ, giảm thiểu số lần gọi trùng lặp lên server trường và đảm bảo tốc độ phản hồi < 0.05s.
-* **Đúng chuẩn môn học 3 Tầng:** Đạt đầy đủ tiêu chí Tầng 1 (Bản chất lõi), Tầng 2 (Kỹ nghệ phần mềm với Docker, CI/CD, Pytest) và Tầng 3 (Nâng cao).
+### ✨ Tính năng nổi bật
+
+* **100% Dữ liệu thực tế:** Tích hợp trực tiếp với API cổng đào tạo SGU (`thongtindaotao.sgu.edu.vn`), không dùng dữ liệu giả lập.
+* **Cơ chế Reverse-Engineered Security:** Tự động tạo dynamic header `ua` với thuật toán mã hóa timestamp + XOR bitwise, tương thích hoàn toàn với cơ chế bảo mật của cổng đào tạo.
+* **Smart SQLite Caching:** Tự động cache kết quả học tập và thời khóa biểu cục bộ, đảm bảo tốc độ phản hồi < 0.05s và giảm thiểu áp lực request lên máy chủ trường.
+* **Hỗ trợ đa phương thức truyền tải (Transports):**
+  * `stdio`: Tích hợp chuẩn cho Claude Desktop, Cursor, Antigravity.
+  * `SSE` (Server-Sent Events): Dùng khi triển khai dạng dịch vụ mạng LAN hoặc Web container.
+* **Bộ tính năng phong phú:** 15 Tools, 4 Resources ngữ cảnh, và 3 Prompts mẫu thông minh.
 
 ---
 
-## 🏛️ 2. Kiến trúc Ba Tầng theo chuẩn môn học
+## 🏛️ Kiến trúc hệ thống
 
 ```
 ┌────────────────────────────────────────────────────────┐
 │                   Trợ lý AI (Clients)                  │
-│       Claude Desktop  │  Cursor IDE  │  Web Client     │
+│       Claude Desktop  │  Cursor IDE  │   Antigravity   │
 └───────────────────────────┬────────────────────────────┘
-                            │ Giao thức JSON-RPC (stdio / SSE)
+                            │ JSON-RPC (stdio / SSE)
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │                SGU ACADEMIC MCP SERVER                 │
 │                                                        │
 │  [15 MCP Tools]      [4 Resources]       [3 Prompts]   │
-│  • TKB tuần/ngày     • Sơ đồ CNTT        • Kế hoạch học│
-│  • Lịch thi/Đếm ngày • Chuẩn tốt nghiệp  • Lộ trình thi│
-│  • Bảng điểm & GPA   • Quy chế cảnh báo  • Audit hồ sơ │
-│  • Học phí & Nợ      • Danh bạ cơ sở                   │
+│  • TKB tuần / ngày   • Lộ trình CNTT     • Kế hoạch học│
+│  • Lịch thi & Đếm    • Chuẩn tốt nghiệp  • Ôn thi cấp tốc│
+│  • Điểm & GPA audit  • Quy chế học vụ    • Audit hồ sơ │
+│  • Học phí & Nợ môn  • Danh bạ cơ sở                   │
 │                                                        │
-│  [Tầng 2 & 3: Security & Performance Engine]           │
-│  • SguEncryptor: Thuật toán sinh dynamic 'ua' header   │
+│  [Security & Performance Engine]                       │
+│  • SguEncryptor: Thuật toán tạo header dynamic 'ua'    │
 │  • SguCache: SQLite Caching & Fallback Controller      │
 └───────────────────────────┬────────────────────────────┘
                             │ HTTPS (REST API)
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│     Cổng thông tin đào tạo SGU (AQTech / PSC)          │
-│            thongtindaotao.sgu.edu.vn                   │
+│              Cổng thông tin đào tạo SGU                │
+│              thongtindaotao.sgu.edu.vn                 │
 └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🛠️ 3. Danh mục chức năng
+## 🛠️ Danh mục năng lực MCP
 
-### 3.1. 15 MCP Tools (Hành động AI có thể gọi)
-| STT | Tên Tool | Mô tả chức năng |
+### 1. 15 MCP Tools (Hành động có thể gọi)
+
+| STT | Tool Name | Mô tả |
 | :---: | :--- | :--- |
 | 1 | `sgu_login` | Đăng nhập tài khoản sinh viên vào cổng thông tin đào tạo SGU |
-| 2 | `get_registered_courses` | Lấy danh sách các môn đã đăng ký trong kỳ của sinh viên |
-| 3 | `get_weekly_schedule` | Lấy thời khóa biểu học kỳ chi tiết theo tuần |
-| 4 | `get_today_schedule` | Tra cứu nhanh lịch học hôm nay (phòng, ca học, giảng viên) |
-| 5 | `check_schedule_conflict` | Kiểm tra trùng lịch học khi định đăng ký thêm môn học mới |
+| 2 | `get_registered_courses` | Lấy danh sách các môn đã đăng ký thành công trong kỳ |
+| 3 | `get_weekly_schedule` | Lấy thời khóa biểu học kỳ chi tiết theo từng thứ trong tuần |
+| 4 | `get_today_schedule` | Tra cứu nhanh lịch học hôm nay và ngày mai (phòng, ca, giảng viên) |
+| 5 | `check_schedule_conflict` | Kiểm tra xung đột lịch học khi dự định đăng ký môn mới |
 | 6 | `get_exam_schedule` | Tra cứu lịch thi chính thức từ SGU (ngày thi, phòng, ca, SBD) |
-| 7 | `get_exam_countdown` | Đếm ngược ngày thi và cảnh báo các môn thi dồn dập trong 1 ngày |
-| 8 | `get_student_profile` | Lấy hồ sơ sinh viên chính thức (họ tên, lớp, ngành, cố vấn học tập) |
-| 9 | `get_semester_grades` | Lấy bảng điểm học tập chi tiết từng học kỳ |
-| 10 | `calculate_gpa_summary` | Tổng hợp GPA tích lũy, số tín chỉ đạt và các môn nợ |
-| 11 | `simulate_target_gpa` | Thuật toán mô phỏng điểm số cần đạt ở các môn tới để đạt bằng Giỏi |
+| 7 | `get_exam_countdown` | Đếm ngược ngày thi và cảnh báo lịch thi dồn dập trong cùng 1 ngày |
+| 8 | `get_student_profile` | Lấy hồ sơ sinh viên chính thức (họ tên, MSSV, lớp, ngành, CVHT) |
+| 9 | `get_semester_grades` | Lấy bảng điểm chi tiết theo từng học kỳ |
+| 10 | `calculate_gpa_summary` | Tổng hợp GPA tích lũy, số tín chỉ đạt và danh sách môn nợ |
+| 11 | `simulate_target_gpa` | Thuật toán mô phỏng điểm số cần đạt ở các môn tới để đạt mục tiêu GPA |
 | 12 | `get_tuition_fees` | Tra cứu học phí từng kỳ, số tiền đã đóng và số tiền nợ đọng |
-| 13 | `get_sgu_notifications` | Lấy thông báo mới nhất từ Ban Giám hiệu và Phòng Đào tạo |
-| 14 | `get_course_offerings` | Tra cứu các lớp học phần đang mở kèm số lượng slot còn lại |
+| 13 | `get_sgu_notifications` | Lấy thông báo mới nhất từ Nhà trường và Phòng Đào tạo |
+| 14 | `get_course_offerings` | Tra cứu danh sách lớp học phần đang mở kèm số lượng chỗ còn lại |
 | 15 | `check_prerequisites` | Kiểm tra điều kiện môn tiên quyết ngành CNTT SGU |
 
-### 3.2. 4 MCP Resources (Tài nguyên đọc ngữ cảnh)
-* `sgu://curriculum/it-roadmap`: Toàn bộ lộ trình 8 học kỳ và khung môn học ngành CNTT SGU.
-* `sgu://regulations/academic-warning`: Quy chế tính điểm hệ 4 và các mức cảnh cáo học vụ.
-* `sgu://graduation/standards`: Điều kiện xét tốt nghiệp (tín chỉ, TOEIC 500/VSTEP, chứng chỉ tin học).
-* `sgu://campuses/directory`: Địa chỉ và ký hiệu phòng học các cơ sở của Trường ĐH Sài Gòn.
+### 2. 4 MCP Resources (Tài nguyên đọc ngữ cảnh)
 
-### 3.3. 3 MCP Prompts (Mẫu tác vụ AI định sẵn)
-* `plan_weekly_routine`: Tự động lập lịch học và sinh hoạt tối ưu dựa trên thời khóa biểu tuần thực tế.
-* `exam_cramming_strategy`: Lập chiến lược ôn thi nước rút theo mức độ khẩn cấp của lịch thi.
-* `graduation_audit`: Đối soát toàn diện điểm và số tín chỉ của sinh viên so với chuẩn đầu ra tốt nghiệp.
+* `sgu://curriculum/it-roadmap`: Toàn bộ lộ trình 8 học kỳ và khung chương trình ngành CNTT SGU.
+* `sgu://regulations/academic-warning`: Quy chế tính điểm hệ 4 và các khung cảnh cáo học vụ.
+* `sgu://graduation/standards`: Điều kiện xét tốt nghiệp (tín chỉ, chuẩn ngoại ngữ TOEIC 500/VSTEP, tin học).
+* `sgu://campuses/directory`: Danh bạ cơ sở và ký hiệu các phòng học tại trường Đại học Sài Gòn.
+
+### 3. 3 MCP Prompts (Mẫu tác vụ AI định sẵn)
+
+* `plan_weekly_routine`: Tự động phân bổ lịch tự học và sinh hoạt dựa trên thời khóa biểu tuần thực tế.
+* `exam_cramming_strategy`: Lập chiến lược ôn thi nước rút tối ưu theo mức độ khẩn cấp của lịch thi.
+* `graduation_audit`: Đối soát toàn diện điểm số và tín chỉ tích lũy so với chuẩn đầu ra tốt nghiệp.
 
 ---
 
-## 🚀 4. Hướng dẫn cài đặt và khởi chạy
+## 🚀 Cài đặt và Sử dụng
 
-### Yêu cầu hệ thống:
-* Python 3.10+ (Khuyến nghị 3.12)
-* Docker & Docker Compose (tùy chọn)
+### Yêu cầu môi trường
+* Python 3.10 trở lên
+* Docker & Docker Compose *(tùy chọn)*
 
-### Cách 1: Chạy trực tiếp bằng Python
-1. Clone repo và cài đặt thư viện:
+### Cách 1: Chạy trực tiếp qua Python
+
+1. **Clone repository:**
    ```bash
-   git clone <repo-url>
-   cd CCNLTHD
+   git clone https://github.com/your-username/sgu-academic-mcp.git
+   cd sgu-academic-mcp
+   ```
+
+2. **Cài đặt dependencies:**
+   ```bash
    pip install -r requirements.txt
    ```
-2. Cấu hình file `.env` (tạo từ `.env.example`):
+
+3. **Cấu hình thông tin đăng nhập:**
+   Tạo file `.env` từ mẫu `.env.example`:
    ```env
-   SGU_STUDENT_ID=3122410001
+   SGU_STUDENT_ID=3122xxxxxx
    SGU_PASSWORD=MatKhauCuaBan
    ```
-3. Chạy kiểm thử tự động:
-   ```bash
-   pytest
-   ```
-4. Khởi động MCP Server ở chế độ stdio (dùng cho Claude Desktop / Cursor):
-   ```bash
-   python -m sgu_mcp.server --transport stdio
-   ```
-   Hoặc chế độ SSE (dùng cho mạng mạng LAN / Web API):
-   ```bash
-   python -m sgu_mcp.server --transport sse --port 8000
-   ```
 
-### Cách 2: Chạy 1 lệnh với Docker Compose (Chuẩn Tầng 2)
+4. **Khởi động MCP Server:**
+   * Chế độ **stdio** (khuyên dùng cho Claude Desktop, Cursor, Antigravity):
+     ```bash
+     python -m sgu_mcp.server --transport stdio
+     ```
+   * Chế độ **SSE** (dùng khi deploy qua mạng HTTP):
+     ```bash
+     python -m sgu_mcp.server --transport sse --port 8000
+     ```
+
+---
+
+### Cách 2: Triển khai nhanh với Docker
+
 ```bash
 docker compose up -d --build
 ```
-Server sẽ tự động khởi chạy tại `http://localhost:8000/sse`.
+Dịch vụ MCP Server sẽ chạy ở cổng `8000` (`http://localhost:8000/sse`).
 
 ---
 
-## 🔌 5. Tích hợp với Claude Desktop
+## 🔌 Hướng dẫn tích hợp AI Clients
+
+### 1. Claude Desktop
 
 Mở file cấu hình của Claude Desktop:
 * **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
@@ -144,7 +162,7 @@ Thêm cấu hình server:
         "--transport",
         "stdio"
       ],
-      "cwd": "D:/CCNLTHD",
+      "cwd": "C:/path/to/sgu-academic-mcp",
       "env": {
         "PYTHONIOENCODING": "utf-8"
       }
@@ -152,47 +170,105 @@ Thêm cấu hình server:
   }
 }
 ```
-Khởi động lại Claude Desktop, bạn sẽ thấy biểu tượng công cụ xuất hiện với đầy đủ 15 Tools!
+
+### 2. Antigravity IDE / Cursor
+
+Cấu hình trong file `mcp_config.json` của workspace hoặc global:
+```json
+{
+  "mcpServers": {
+    "sgu_academic_server": {
+      "command": "python",
+      "args": [
+        "-m",
+        "sgu_mcp.server",
+        "--transport",
+        "stdio"
+      ],
+      "cwd": "C:/path/to/sgu-academic-mcp",
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
+```
 
 ---
 
-## 🧪 6. Kết quả Kiểm thử (Pytest Verification)
+## 🧪 Kiểm thử tự động (Unit Tests)
+
+Dự án đi kèm bộ test tự động sử dụng `pytest`:
+
 ```bash
-$ pytest
+pytest -v
+```
+
+Kết quả kiểm thử:
+```text
 ============================= test session starts =============================
 platform win32 -- Python 3.12.10, pytest-9.0.2
 collected 12 items
 
-tests\test_cache.py ...                                                  [ 25%]
-tests\test_crypto.py ..                                                  [ 41%]
-tests\test_mcp_server.py ....                                            [ 75%]
-tests\test_tools_offline.py ...                                          [100%]
-============================== 12 passed in 2.06s ==============================
+tests/test_cache.py::test_cache_set_and_get PASSED                       [  8%]
+tests/test_cache.py::test_cache_ttl_expiration PASSED                    [ 16%]
+tests/test_cache.py::test_cache_clear PASSED                             [ 25%]
+tests/test_crypto.py::test_isapi_extraction PASSED                       [ 33%]
+tests/test_crypto.py::test_ua_header_generation PASSED                   [ 41%]
+tests/test_mcp_server.py::test_server_tools_registration PASSED          [ 50%]
+tests/test_mcp_server.py::test_server_resources_registration PASSED      [ 58%]
+tests/test_mcp_server.py::test_server_prompts_registration PASSED        [ 66%]
+tests/test_mcp_server.py::test_call_prerequisites_tool_via_server PASSED [ 75%]
+tests/test_tools_offline.py::test_simulate_target_gpa_achievable PASSED  [ 83%]
+tests/test_tools_offline.py::test_simulate_target_gpa_impossible PASSED  [ 91%]
+tests/test_tools_offline.py::test_check_prerequisites PASSED             [100%]
+============================== 12 passed in 2.07s ==============================
 ```
 
 ---
 
-## 📄 7. Cấu trúc mã nguồn
+## 📁 Cấu trúc thư mục
+
 ```
+sgu-academic-mcp/
 ├── sgu_mcp/
-│   ├── config.py              # Cấu hình Pydantic Settings
+│   ├── config.py              # Cấu hình Pydantic BaseSettings
 │   ├── server.py              # Entrypoint MCP Server (Stdio & SSE)
 │   ├── core/
-│   │   ├── crypto.py          # Thuật toán sinh dynamic 'ua' header
-│   │   ├── cache.py           # Bộ nhớ đệm SQLite
-│   │   └── sgu_client.py      # HTTP Client kết nối API thongtindaotao.sgu.edu.vn
+│   │   ├── crypto.py          # Reverse-engineered dynamic 'ua' header
+│   │   ├── cache.py           # SQLite Caching Layer
+│   │   └── sgu_client.py      # HTTP API Client kết nối thongtindaotao.sgu.edu.vn
 │   ├── modules/
-│   │   ├── schedule.py        # 5 Tools về TKB, đăng ký môn & trùng lịch
-│   │   ├── exams.py           # 2 Tools về Lịch thi & đếm ngược ngày thi
-│   │   ├── academic.py        # 4 Tools về Hồ sơ SV, bảng điểm & mô phỏng GPA
-│   │   └── tuition.py         # 4 Tools về Học phí, thông báo & môn tiên quyết
+│   │   ├── schedule.py        # 5 Tools: Thời khóa biểu, đăng ký môn & kiểm tra trùng
+│   │   ├── exams.py           # 2 Tools: Lịch thi & đếm ngược ngày thi
+│   │   ├── academic.py        # 4 Tools: Hồ sơ, bảng điểm & mô phỏng GPA
+│   │   └── tuition.py         # 4 Tools: Học phí, thông báo & môn tiên quyết
 │   ├── resources/
-│   │   └── content.py         # 4 Tài nguyên đọc ngữ cảnh SGU
+│   │   └── content.py         # 4 MCP Resources ngữ cảnh học vụ
 │   └── prompts/
-│       └── templates.py       # 3 Mẫu prompt thông minh
+│       └── templates.py       # 3 MCP Prompt templates
+├── skills/
+│   └── sgu-academic/
+│       └── SKILL.md           # Agent Skill tích hợp cho AI assistants
 ├── hands_on_lab/
-│   └── HANDS_ON_LAB.md        # Tài liệu thực hành 30-45 phút cho nhóm khác chấm chéo
-├── tests/                     # 12 bài kiểm thử tự động pytest
-├── Dockerfile & docker-compose.yml
-└── requirements.txt
+│   └── HANDS_ON_LAB.md        # Hướng dẫn thực hành từng bước (Hands-on Guide)
+├── tests/                     # 12 unit tests tự động
+├── Dockerfile                 # Container image build
+├── docker-compose.yml         # Container orchestration
+└── requirements.txt           # Python dependencies
 ```
+
+---
+
+## 🔒 Bảo mật & Quyền riêng tư
+
+* **Xử lý cục bộ (Local Execution):** Mọi thông tin đăng nhập và dữ liệu học tập cá nhân được xử lý hoàn toàn trên máy cục bộ của người dùng.
+* **Không lưu trữ tập trung:** Máy chủ không chuyển tiếp hoặc lưu trữ thông tin nhạy cảm lên bất kỳ server bên thứ ba nào.
+* **File `.env` được bảo vệ:** Cấu hình git mặc định đã ignore `.env` và database cache để tránh vô tình công khai tài khoản.
+
+---
+
+## 📜 Giấy phép (License)
+
+Dự án được phát hành theo giấy phép [MIT License](LICENSE).
+Tự do sử dụng, chỉnh sửa và tích hợp cho các mục đích học tập và nghiên cứu cá nhân.
