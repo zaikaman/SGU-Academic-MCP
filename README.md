@@ -35,19 +35,19 @@
 └───────────────────────────┬────────────────────────────┘
                             │ JSON-RPC (stdio / SSE)
                             ▼
-┌────────────────────────────────────────────────────────┐
-│                SGU ACADEMIC MCP SERVER                 │
-│                                                        │
-│  [15 MCP Tools]      [4 Resources]       [3 Prompts]   │
-│  • TKB tuần / ngày   • Lộ trình CNTT     • Kế hoạch học│
-│  • Lịch thi & Đếm    • Chuẩn tốt nghiệp  • Ôn thi cấp tốc│
-│  • Điểm & GPA audit  • Quy chế học vụ    • Audit hồ sơ │
-│  • Học phí & Nợ môn  • Danh bạ cơ sở                   │
-│                                                        │
-│  [Security & Performance Engine]                       │
-│  • SguEncryptor: Thuật toán tạo header dynamic 'ua'    │
-│  • SguCache: SQLite Caching & Fallback Controller      │
-└───────────────────────────┬────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│                   SGU ACADEMIC MCP SERVER                 │
+│                                                           │
+│  [15 MCP Tools]      [4 Resources]       [3 Prompts]      │
+│  • TKB tuần / ngày   • Lộ trình CNTT     • Kế hoạch học   │
+│  • Lịch thi & Đếm    • Chuẩn tốt nghiệp  • Ôn thi cấp tốc │
+│  • Điểm & GPA audit  • Quy chế học vụ    • Audit hồ sơ    │
+│  • Học phí & Nợ môn  • Danh bạ cơ sở                      │
+│                                                           │
+│  [Security & Performance Engine]                          │
+│  • SguEncryptor: Thuật toán tạo header dynamic 'ua'       │
+│  • SguCache: SQLite Caching & Fallback Controller         │
+└───────────────────────────┬───────────────────────────────┘
                             │ HTTPS (REST API)
                             ▼
 ┌────────────────────────────────────────────────────────┐
