@@ -130,11 +130,8 @@ class SguApiClient:
         return await self._post_api(endpoint, payload=payload, cache_key=cache_key, ttl=1800)
 
     async def get_weekly_schedule(self, semester_id: Optional[str] = None) -> dict[str, Any]:
-        """Lấy thời khóa biểu học kỳ / tuần của sinh viên"""
-        endpoint = "/api/web/w-locdstkbtuanusertheohocky"
-        payload = {"id_hoc_ky": semester_id} if semester_id else {}
-        cache_key = f"schedule_{self.current_student_id or 'current'}_{semester_id or 'current'}"
-        return await self._post_api(endpoint, payload=payload, cache_key=cache_key, ttl=3600)
+        """Lấy thời khóa biểu học kỳ / tuần của sinh viên (lấy từ dữ liệu môn học đã đăng ký thực tế)"""
+        return await self.get_registered_courses()
 
     async def get_exam_schedule(self, semester_id: Optional[str] = None) -> dict[str, Any]:
         """Lấy lịch thi của sinh viên"""

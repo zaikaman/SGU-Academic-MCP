@@ -154,6 +154,13 @@ def create_server() -> MCPServer:
 
 
 def main():
+    if sys.platform == "win32":
+        try:
+            sys.stdin.reconfigure(encoding="utf-8")
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
+
     parser = argparse.ArgumentParser(description="SGU Academic MCP Server")
     parser.add_argument("--transport", choices=["stdio", "sse"], default="stdio", help="Giao thức truyền tải (stdio hoặc sse)")
     parser.add_argument("--host", default=settings.mcp_host, help="Host cho chế độ SSE")
