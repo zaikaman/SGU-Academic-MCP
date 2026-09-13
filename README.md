@@ -2,7 +2,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Protocol-purple.svg)](https://modelcontextprotocol.io/)
-[![Tests](https://img.shields.io/badge/tests-48%20passed-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-49%20passed-brightgreen.svg)](tests/)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](tests/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -163,11 +163,44 @@ Nếu bạn sử dụng các công cụ AI dạng dòng lệnh hoặc muốn ki�
 python -m sgu_mcp.server --transport sse --port 8000
 ```
 
-### Triển khai với Docker
+### Triển khai với Docker & Docker Compose (SSE Mode)
+
+Dự án đã được đóng gói container hóa chuẩn production với non-root user (`appuser`), Docker build cache, volume mount cho SQLite database, và endpoint Healthcheck tự động.
+
+#### Cách 1: Sử dụng Docker Compose (Khuyên dùng)
 ```bash
+# 1. Khởi động MCP Server ở chế độ nền (Background)
 docker compose up -d --build
+
+# 2. Xem logs hoạt động thời gian thực
+docker compose logs -f
+
+# 3. Kiểm tra trạng thái container và healthcheck
+docker compose ps
+
+# 4. Dừng dịch vụ
+docker compose down
 ```
-Dịch vụ MCP Server sẽ chạy ở cổng `8000` (`http://localhost:8000/sse`).
+
+#### Cách 2: Sử dụng Docker CLI thuần
+```bash
+# Build image
+docker build -t sgu-mcp-server:latest .
+
+# Chạy container kèm mount thư mục data và nạp .env
+docker run -d \
+  --name sgu_mcp_academic_server \
+  -p 8000:8000 \
+  --env-file .env \
+  -v ${PWD}/data:/app/data \
+  sgu-mcp-server:latest
+```
+
+#### Các Endpoint hoạt động:
+* **MCP SSE Endpoint:** `http://localhost:8000/sse` (Dành cho AI Agent kết nối qua mạng)
+* **Healthcheck Endpoint:** `http://localhost:8000/health` (Trả về trạng thái dịch vụ `{"status": "healthy", ...}`)
+* **Messages Endpoint:** `http://localhost:8000/messages/`
+
 
 ### Mẫu cấu hình thủ công JSON (Dành cho mọi Client)
 
@@ -201,7 +234,7 @@ Cấu trúc JSON này tương thích 100% với Claude Desktop, Antigravity, VS 
 Dự án đi kèm bộ test tự động sử dụng `pytest` với **độ bao phủ tuyệt đối 100%** toàn bộ mã nguồn:
 
 ```bash
-# Chạy toàn bộ 48 test cases kèm báo cáo độ bao phủ
+# Chạy toàn bộ 49 test cases kèm báo cáo độ bao phủ
 pytest --cov=sgu_mcp --cov-report=term-missing
 ```
 
@@ -209,12 +242,12 @@ Kết quả kiểm thử thực tế:
 ```text
 ============================= test session starts =============================
 platform win32 -- Python 3.12.10, pytest-9.0.2
-collected 48 items
+collected 49 items
 
 tests\test_cache.py ....                                                 [  8%]
 tests\test_crypto.py ..                                                  [ 12%]
-tests\test_mcp_server.py ........                                        [ 29%]
-tests\test_modules.py ..................                                 [ 66%]
+tests\test_mcp_server.py .........                                       [ 30%]
+tests\test_modules.py ..................                                 [ 67%]
 tests\test_sgu_client.py .............                                   [ 93%]
 tests\test_tools_offline.py ...                                          [100%]
 
@@ -232,10 +265,10 @@ sgu_mcp\modules\schedule.py       87      0   100%
 sgu_mcp\modules\tuition.py        45      0   100%
 sgu_mcp\prompts\templates.py       1      0   100%
 sgu_mcp\resources\content.py       2      0   100%
-sgu_mcp\server.py                101      0   100%
+sgu_mcp\server.py                106      0   100%
 ------------------------------------------------------------
-TOTAL                            516      0   100%
-============================== 48 passed in 3.93s ==============================
+TOTAL                            521      0   100%
+============================== 49 passed in 3.93s ==============================
 ```
 
 ---

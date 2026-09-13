@@ -248,3 +248,16 @@ def test_dunder_main(monkeypatch):
         assert mock_run.called
 
 
+def test_server_health_route():
+    from starlette.testclient import TestClient
+    server = create_server()
+    app = server.sse_app(sse_path="/sse", message_path="/messages/", host="127.0.0.1")
+    client = TestClient(app, base_url="http://127.0.0.1:8000")
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert data["server"] == "sgu_academic_server"
+
+
+
