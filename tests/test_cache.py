@@ -45,3 +45,27 @@ def test_cache_clear(tmp_path):
 
     cache.clear()
     assert cache.get("k2") is None
+
+
+def test_cache_exceptions(tmp_path, monkeypatch):
+    db_file = tmp_path / "test_cache_err.db"
+    cache = SguCache(db_path=str(db_file))
+
+    import sqlite3
+    def mock_connect(*args, **kwargs):
+        raise sqlite3.OperationalError("Simulated DB error")
+
+    monkeypatch.setattr(sqlite3, "connect", mock_connect)
+
+    # get should catch exception and return None
+    assert cache.get("any_key") is None
+
+    # set should catch exception and pass
+    cache.set("any_key", {"data": 123})
+
+    # clear with key should catch exception and pass
+    cache.clear("any_key")
+
+    # clear all should catch exception and pass
+    cache.clear()
+

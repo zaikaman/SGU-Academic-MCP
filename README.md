@@ -2,7 +2,8 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Protocol-purple.svg)](https://modelcontextprotocol.io/)
-[![Tests](https://img.shields.io/badge/tests-12%20passed-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-48%20passed-brightgreen.svg)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](tests/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -177,33 +178,46 @@ Thêm đoạn JSON sau vào `claude_desktop_config.json` hoặc `.cursor/mcp.jso
 
 ---
 
-## Kiểm thử tự động (Unit Tests)
+## Kiểm thử tự động (Unit Tests & 100% Coverage)
 
-Dự án đi kèm bộ test tự động sử dụng `pytest`:
+Dự án đi kèm bộ test tự động sử dụng `pytest` với **độ bao phủ tuyệt đối 100%** toàn bộ mã nguồn:
 
 ```bash
-pytest -v
+# Chạy toàn bộ 48 test cases kèm báo cáo độ bao phủ
+pytest --cov=sgu_mcp --cov-report=term-missing
 ```
 
-Kết quả kiểm thử:
+Kết quả kiểm thử thực tế:
 ```text
 ============================= test session starts =============================
 platform win32 -- Python 3.12.10, pytest-9.0.2
-collected 12 items
+collected 48 items
 
-tests/test_cache.py::test_cache_set_and_get PASSED                       [  8%]
-tests/test_cache.py::test_cache_ttl_expiration PASSED                    [ 16%]
-tests/test_cache.py::test_cache_clear PASSED                             [ 25%]
-tests/test_crypto.py::test_isapi_extraction PASSED                       [ 33%]
-tests/test_crypto.py::test_ua_header_generation PASSED                   [ 41%]
-tests/test_mcp_server.py::test_server_tools_registration PASSED          [ 50%]
-tests/test_mcp_server.py::test_server_resources_registration PASSED      [ 58%]
-tests/test_mcp_server.py::test_server_prompts_registration PASSED        [ 66%]
-tests/test_mcp_server.py::test_call_prerequisites_tool_via_server PASSED [ 75%]
-tests/test_tools_offline.py::test_simulate_target_gpa_achievable PASSED  [ 83%]
-tests/test_tools_offline.py::test_simulate_target_gpa_impossible PASSED  [ 91%]
-tests/test_tools_offline.py::test_check_prerequisites PASSED             [100%]
-============================== 12 passed in 2.07s ==============================
+tests\test_cache.py ....                                                 [  8%]
+tests\test_crypto.py ..                                                  [ 12%]
+tests\test_mcp_server.py ........                                        [ 29%]
+tests\test_modules.py ..................                                 [ 66%]
+tests\test_sgu_client.py .............                                   [ 93%]
+tests\test_tools_offline.py ...                                          [100%]
+
+=============================== tests coverage ================================
+Name                           Stmts   Miss  Cover   Missing
+------------------------------------------------------------
+sgu_mcp\__init__.py                1      0   100%
+sgu_mcp\config.py                 14      0   100%
+sgu_mcp\core\cache.py             47      0   100%
+sgu_mcp\core\crypto.py            38      0   100%
+sgu_mcp\core\sgu_client.py        99      0   100%
+sgu_mcp\modules\academic.py       49      0   100%
+sgu_mcp\modules\exams.py          32      0   100%
+sgu_mcp\modules\schedule.py       87      0   100%
+sgu_mcp\modules\tuition.py        45      0   100%
+sgu_mcp\prompts\templates.py       1      0   100%
+sgu_mcp\resources\content.py       2      0   100%
+sgu_mcp\server.py                101      0   100%
+------------------------------------------------------------
+TOTAL                            516      0   100%
+============================== 48 passed in 3.93s ==============================
 ```
 
 ---
@@ -217,7 +231,7 @@ sgu-academic-mcp/
 │   ├── server.py              # Entrypoint MCP Server (Stdio & SSE)
 │   ├── core/
 │   │   ├── crypto.py          # Reverse-engineered dynamic 'ua' header
-│   │   ├── cache.py           # SQLite Caching Layer
+│   │   ├── cache.py           # SQLite Caching Layer & Fallback
 │   │   └── sgu_client.py      # HTTP API Client kết nối thongtindaotao.sgu.edu.vn
 │   ├── modules/
 │   │   ├── schedule.py        # 5 Tools: Thời khóa biểu, đăng ký môn & kiểm tra trùng
@@ -233,7 +247,13 @@ sgu-academic-mcp/
 │       └── SKILL.md           # Agent Skill tích hợp cho AI assistants
 ├── hands_on_lab/
 │   └── HANDS_ON_LAB.md        # Hướng dẫn thực hành từng bước (Hands-on Guide)
-├── tests/                     # 12 unit tests tự động
+├── tests/                     # 48 unit tests tự động (100% Coverage)
+│   ├── test_cache.py          # Kiểm thử SQLite Caching, TTL & Error handling
+│   ├── test_crypto.py         # Kiểm thử tạo header 'ua' reverse-engineered
+│   ├── test_sgu_client.py     # Kiểm thử API Client, Auto-login & HTTP communication
+│   ├── test_modules.py        # Kiểm thử toàn diện 15 Tools & nghiệp vụ học vụ
+│   ├── test_mcp_server.py     # Kiểm thử MCP Protocol (Tools, Resources, Prompts & CLI)
+│   └── test_tools_offline.py  # Kiểm thử offline mô phỏng GPA & môn tiên quyết
 ├── Dockerfile                 # Container image build
 ├── docker-compose.yml         # Container orchestration
 └── requirements.txt           # Python dependencies
