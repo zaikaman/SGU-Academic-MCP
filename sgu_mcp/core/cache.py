@@ -7,7 +7,7 @@ import json
 import os
 import sqlite3
 import time
-from typing import Any, Optional
+from typing import Any
 
 
 class SguCache:
@@ -33,14 +33,14 @@ class SguCache:
             """)
             conn.commit()
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Lấy dữ liệu từ cache nếu chưa hết hạn"""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "SELECT data_json, updated_at, ttl_seconds FROM api_cache WHERE cache_key = ?",
-                    (key,)
+                    (key,),
                 )
                 row = cursor.fetchone()
                 if not row:
@@ -60,15 +60,18 @@ class SguCache:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT OR REPLACE INTO api_cache (cache_key, data_json, updated_at, ttl_seconds)
                     VALUES (?, ?, ?, ?)
-                """, (key, json.dumps(data, ensure_ascii=False), time.time(), ttl_seconds))
+                """,
+                    (key, json.dumps(data, ensure_ascii=False), time.time(), ttl_seconds),
+                )
                 conn.commit()
         except Exception:
             pass
 
-    def clear(self, key: Optional[str] = None):
+    def clear(self, key: str | None = None):
         """Xóa một key hoặc xóa toàn bộ cache"""
         try:
             with sqlite3.connect(self.db_path) as conn:

@@ -3,7 +3,8 @@ Module MCP Tools: Học phí, Thông báo & Đăng ký môn học SGU
 Gọi API thật từ thongtindaotao.sgu.edu.vn
 """
 
-from typing import Any, Optional
+from typing import Any
+
 from sgu_mcp.core.sgu_client import sgu_client
 
 # Bảng tra cứu môn tiên quyết chính thức ngành CNTT trường Đại học Sài Gòn
@@ -18,7 +19,7 @@ SGU_IT_PREREQUISITES = {
     "Trí tuệ nhân tạo": ["Cấu trúc dữ liệu và giải thuật"],
     "Các công nghệ lập trình hiện đại": ["Công nghệ phần mềm"],
     "Phát triển ứng dụng Web nâng cao": ["Công nghệ phần mềm"],
-    "Khóa luận tốt nghiệp": ["Công nghệ phần mềm", "Các công nghệ lập trình hiện đại"]
+    "Khóa luận tốt nghiệp": ["Công nghệ phần mềm", "Các công nghệ lập trình hiện đại"],
 }
 
 
@@ -42,20 +43,22 @@ async def tool_get_tuition_fees() -> dict[str, Any]:
             debt = 0
         total_debt += debt
 
-        formatted_fees.append({
-            "hoc_ky": item.get("ten_hoc_ky"),
-            "hoc_phi": item.get("hoc_phi"),
-            "mien_giam": item.get("mien_giam"),
-            "phai_thu": item.get("phai_thu"),
-            "da_dong": item.get("da_thu"),
-            "con_no": item.get("con_no"),
-            "ghi_chu": item.get("ghi_chu")
-        })
+        formatted_fees.append(
+            {
+                "hoc_ky": item.get("ten_hoc_ky"),
+                "hoc_phi": item.get("hoc_phi"),
+                "mien_giam": item.get("mien_giam"),
+                "phai_thu": item.get("phai_thu"),
+                "da_dong": item.get("da_thu"),
+                "con_no": item.get("con_no"),
+                "ghi_chu": item.get("ghi_chu"),
+            }
+        )
 
     return {
         "tong_tien_no_hoc_phi": total_debt,
         "trang_thai_no": "Còn nợ học phí" if total_debt > 0 else "Đã hoàn thành toàn bộ học phí",
-        "chi_tiet_hoc_phi": formatted_fees
+        "chi_tiet_hoc_phi": formatted_fees,
     }
 
 
@@ -70,18 +73,17 @@ async def tool_get_sgu_notifications(limit: int = 10) -> dict[str, Any]:
 
     result = []
     for n in notices:
-        result.append({
-            "id": n.get("id"),
-            "tieu_de": n.get("tieu_de"),
-            "ngay_gui": n.get("ngay_gui"),
-            "noi_dung": n.get("noi_dung"),
-            "is_phai_xem": n.get("is_phai_xem")
-        })
+        result.append(
+            {
+                "id": n.get("id"),
+                "tieu_de": n.get("tieu_de"),
+                "ngay_gui": n.get("ngay_gui"),
+                "noi_dung": n.get("noi_dung"),
+                "is_phai_xem": n.get("is_phai_xem"),
+            }
+        )
 
-    return {
-        "tong_thong_bao": len(result),
-        "danh_sach_thong_bao": result
-    }
+    return {"tong_thong_bao": len(result), "danh_sach_thong_bao": result}
 
 
 async def tool_get_course_offerings(page: int = 1, limit: int = 20) -> dict[str, Any]:
@@ -95,24 +97,22 @@ async def tool_get_course_offerings(page: int = 1, limit: int = 20) -> dict[str,
 
     courses = []
     for g in groups:
-        courses.append({
-            "ma_mon": g.get("ma_mon"),
-            "ten_mon": g.get("ten_mon"),
-            "nhom_to": g.get("nhom_to"),
-            "so_tin_chi": g.get("so_tc_so"),
-            "lop": g.get("lop"),
-            "da_dang_ky": g.get("sl_dk"),
-            "tong_slot": g.get("sl_cp"),
-            "slot_con_lai": g.get("sl_cl"),
-            "thoi_khoa_bieu": g.get("tkb"),
-            "con_cho": (g.get("sl_cl") or 0) > 0
-        })
+        courses.append(
+            {
+                "ma_mon": g.get("ma_mon"),
+                "ten_mon": g.get("ten_mon"),
+                "nhom_to": g.get("nhom_to"),
+                "so_tin_chi": g.get("so_tc_so"),
+                "lop": g.get("lop"),
+                "da_dang_ky": g.get("sl_dk"),
+                "tong_slot": g.get("sl_cp"),
+                "slot_con_lai": g.get("sl_cl"),
+                "thoi_khoa_bieu": g.get("tkb"),
+                "con_cho": (g.get("sl_cl") or 0) > 0,
+            }
+        )
 
-    return {
-        "trang": page,
-        "so_lop_tra_ve": len(courses),
-        "danh_sach_lop_mo": courses
-    }
+    return {"trang": page, "so_lop_tra_ve": len(courses), "danh_sach_lop_mo": courses}
 
 
 async def tool_check_prerequisites(course_name: str) -> dict[str, Any]:
@@ -132,12 +132,12 @@ async def tool_check_prerequisites(course_name: str) -> dict[str, Any]:
         return {
             "mon_hoc": course_name,
             "mon_tien_quyet": [],
-            "thong_bao": f"Môn '{course_name}' không có điều kiện môn tiên quyết hoặc không nằm trong danh mục chuyên ngành CNTT."
+            "thong_bao": f"Môn '{course_name}' không có điều kiện môn tiên quyết hoặc không nằm trong danh mục chuyên ngành CNTT.",
         }
 
     prereqs = SGU_IT_PREREQUISITES[found_key]
     return {
         "mon_hoc": found_key,
         "mon_tien_quyet": prereqs,
-        "thong_bao": f"Để đăng ký môn '{found_key}', sinh viên SGU bắt buộc phải tích lũy đạt các môn sau: {', '.join(prereqs)}."
+        "thong_bao": f"Để đăng ký môn '{found_key}', sinh viên SGU bắt buộc phải tích lũy đạt các môn sau: {', '.join(prereqs)}.",
     }

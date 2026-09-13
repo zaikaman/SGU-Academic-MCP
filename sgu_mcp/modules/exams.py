@@ -4,11 +4,12 @@ Gọi API thật từ thongtindaotao.sgu.edu.vn
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
+
 from sgu_mcp.core.sgu_client import sgu_client
 
 
-async def tool_get_exam_schedule(semester_id: Optional[str] = None) -> dict[str, Any]:
+async def tool_get_exam_schedule(semester_id: str | None = None) -> dict[str, Any]:
     """
     Tra cứu lịch thi học kỳ chính thức của sinh viên từ hệ thống đào tạo SGU.
     Bao gồm: Môn thi, ngày thi, giờ thi, ca thi, phòng thi, hình thức thi và số báo danh (SBD).
@@ -16,7 +17,7 @@ async def tool_get_exam_schedule(semester_id: Optional[str] = None) -> dict[str,
     return await sgu_client.get_exam_schedule(semester_id=semester_id)
 
 
-async def tool_get_exam_countdown(semester_id: Optional[str] = None) -> dict[str, Any]:
+async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, Any]:
     """
     Phân tích lịch thi của sinh viên:
     1. Đếm ngược số ngày còn lại đến từng môn thi.
@@ -27,8 +28,8 @@ async def tool_get_exam_countdown(semester_id: Optional[str] = None) -> dict[str
     exam_list = raw_data.get("data", []) if isinstance(raw_data.get("data"), list) else []
 
     today = datetime.now().date()
-    upcoming_exams = []
-    exams_by_date = {}
+    upcoming_exams: list[dict[str, Any]] = []
+    exams_by_date: dict[str, list[str]] = {}
 
     for exam in exam_list:
         date_str = exam.get("ngay_thi") or exam.get("ngay")
@@ -53,7 +54,7 @@ async def tool_get_exam_countdown(semester_id: Optional[str] = None) -> dict[str
             "gio_thi": exam.get("gio_thi") or exam.get("tiet_bat_dau"),
             "phong_thi": exam.get("phong_thi") or exam.get("ten_phong"),
             "hinh_thuc": exam.get("hinh_thuc_thi"),
-            "so_ngay_con_lai": days_left
+            "so_ngay_con_lai": days_left,
         }
         upcoming_exams.append(item)
 
@@ -64,10 +65,15 @@ async def tool_get_exam_countdown(semester_id: Optional[str] = None) -> dict[str
     warnings = []
     for d, names in exams_by_date.items():
         if len(names) > 1:
-            warnings.append(f"Cảnh báo: Ngày {d} bạn có {len(names)} môn thi cùng ngày ({', '.join(names)})!")
+            warnings.append(
+                f"Cảnh báo: Ngày {d} bạn có {len(names)} môn thi cùng ngày ({', '.join(names)})!"
+            )
 
     return {
         "tong_so_mon_thi": len(upcoming_exams),
-        "danh_sach_thi": sorted(upcoming_exams, key=lambda x: (x["so_ngay_con_lai"] is None, x["so_ngay_con_lai"] or 999)),
-        "canh_bao_thi_don_dap": warnings
+        "danh_sach_thi": sorted(
+            upcoming_exams,
+            key=lambda x: (x["so_ngay_con_lai"] is None, x["so_ngay_con_lai"] or 999),
+        ),
+        "canh_bao_thi_don_dap": warnings,
     }

@@ -3,10 +3,12 @@ Unit tests cho toàn bộ MCP Server: Tools, Resources, Prompts & CLI main
 Kiểm tra khả năng tương thích với giao thức Model Context Protocol và đạt 100% coverage
 """
 
-import sys
 import runpy
+import sys
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+
 from sgu_mcp.server import create_server, main
 
 
@@ -31,7 +33,7 @@ async def test_server_tools_registration():
         "get_tuition_fees",
         "get_sgu_notifications",
         "get_course_offerings",
-        "check_prerequisites"
+        "check_prerequisites",
     ]
 
     for expected in expected_tools:
@@ -50,7 +52,7 @@ async def test_server_resources_registration():
         "sgu://curriculum/it-roadmap",
         "sgu://regulations/academic-warning",
         "sgu://graduation/standards",
-        "sgu://campuses/directory"
+        "sgu://campuses/directory",
     ]
 
     for expected_uri in expected_resources:
@@ -69,11 +71,7 @@ async def test_server_prompts_registration():
     prompts = await server.list_prompts()
     prompt_names = [p.name for p in prompts]
 
-    expected_prompts = [
-        "plan_weekly_routine",
-        "exam_cramming_strategy",
-        "graduation_audit"
-    ]
+    expected_prompts = ["plan_weekly_routine", "exam_cramming_strategy", "graduation_audit"]
 
     for expected in expected_prompts:
         assert expected in prompt_names, f"Prompt '{expected}' chưa được đăng ký!"
@@ -86,7 +84,9 @@ async def test_server_prompts_registration():
     assert p1_no_arg is not None
 
     # Gọi prompt exam_cramming_strategy có và không có priority_courses
-    p2_with_arg = await server.get_prompt("exam_cramming_strategy", {"priority_courses": "Web, CSDL"})
+    p2_with_arg = await server.get_prompt(
+        "exam_cramming_strategy", {"priority_courses": "Web, CSDL"}
+    )
     assert p2_with_arg is not None
 
     p2_no_arg = await server.get_prompt("exam_cramming_strategy", {})
@@ -102,22 +102,23 @@ async def test_call_all_tools_via_server():
     server = create_server()
 
     # Patches cho tất cả tool modules
-    with patch("sgu_mcp.server.tool_sgu_login", new_callable=AsyncMock) as m_login, \
-         patch("sgu_mcp.server.tool_get_registered_courses", new_callable=AsyncMock) as m_reg, \
-         patch("sgu_mcp.server.tool_get_weekly_schedule", new_callable=AsyncMock) as m_week, \
-         patch("sgu_mcp.server.tool_get_today_schedule", new_callable=AsyncMock) as m_today, \
-         patch("sgu_mcp.server.tool_check_schedule_conflict", new_callable=AsyncMock) as m_conf, \
-         patch("sgu_mcp.server.tool_get_exam_schedule", new_callable=AsyncMock) as m_exam, \
-         patch("sgu_mcp.server.tool_get_exam_countdown", new_callable=AsyncMock) as m_cnt, \
-         patch("sgu_mcp.server.tool_get_student_profile", new_callable=AsyncMock) as m_prof, \
-         patch("sgu_mcp.server.tool_get_semester_grades", new_callable=AsyncMock) as m_grd, \
-         patch("sgu_mcp.server.tool_calculate_gpa_summary", new_callable=AsyncMock) as m_gpa, \
-         patch("sgu_mcp.server.tool_simulate_target_gpa", new_callable=AsyncMock) as m_sim, \
-         patch("sgu_mcp.server.tool_get_tuition_fees", new_callable=AsyncMock) as m_tui, \
-         patch("sgu_mcp.server.tool_get_sgu_notifications", new_callable=AsyncMock) as m_not, \
-         patch("sgu_mcp.server.tool_get_course_offerings", new_callable=AsyncMock) as m_cat, \
-         patch("sgu_mcp.server.tool_check_prerequisites", new_callable=AsyncMock) as m_pre:
-
+    with (
+        patch("sgu_mcp.server.tool_sgu_login", new_callable=AsyncMock) as m_login,
+        patch("sgu_mcp.server.tool_get_registered_courses", new_callable=AsyncMock) as m_reg,
+        patch("sgu_mcp.server.tool_get_weekly_schedule", new_callable=AsyncMock) as m_week,
+        patch("sgu_mcp.server.tool_get_today_schedule", new_callable=AsyncMock) as m_today,
+        patch("sgu_mcp.server.tool_check_schedule_conflict", new_callable=AsyncMock) as m_conf,
+        patch("sgu_mcp.server.tool_get_exam_schedule", new_callable=AsyncMock) as m_exam,
+        patch("sgu_mcp.server.tool_get_exam_countdown", new_callable=AsyncMock) as m_cnt,
+        patch("sgu_mcp.server.tool_get_student_profile", new_callable=AsyncMock) as m_prof,
+        patch("sgu_mcp.server.tool_get_semester_grades", new_callable=AsyncMock) as m_grd,
+        patch("sgu_mcp.server.tool_calculate_gpa_summary", new_callable=AsyncMock) as m_gpa,
+        patch("sgu_mcp.server.tool_simulate_target_gpa", new_callable=AsyncMock) as m_sim,
+        patch("sgu_mcp.server.tool_get_tuition_fees", new_callable=AsyncMock) as m_tui,
+        patch("sgu_mcp.server.tool_get_sgu_notifications", new_callable=AsyncMock) as m_not,
+        patch("sgu_mcp.server.tool_get_course_offerings", new_callable=AsyncMock) as m_cat,
+        patch("sgu_mcp.server.tool_check_prerequisites", new_callable=AsyncMock) as m_pre,
+    ):
         m_login.return_value = {"success": True}
         m_reg.return_value = {"courses": []}
         m_week.return_value = {"schedule": []}
@@ -147,7 +148,9 @@ async def test_call_all_tools_via_server():
         await server.call_tool("get_today_schedule", {})
         m_today.assert_called_once()
 
-        await server.call_tool("check_schedule_conflict", {"target_thu": 2, "target_tiet_bd": 1, "target_so_tiet": 3})
+        await server.call_tool(
+            "check_schedule_conflict", {"target_thu": 2, "target_tiet_bd": 1, "target_so_tiet": 3}
+        )
         m_conf.assert_called_once_with(target_thu=2, target_tiet_bd=1, target_so_tiet=3)
 
         await server.call_tool("get_exam_schedule", {"semester_id": "20241"})
@@ -165,17 +168,12 @@ async def test_call_all_tools_via_server():
         await server.call_tool("calculate_gpa_summary", {"semester_id": "20241"})
         m_gpa.assert_called_once_with(semester_id="20241")
 
-        await server.call_tool("simulate_target_gpa", {
-            "current_gpa": 3.2,
-            "current_credits": 90,
-            "target_gpa": 3.6,
-            "remaining_credits": 30
-        })
+        await server.call_tool(
+            "simulate_target_gpa",
+            {"current_gpa": 3.2, "current_credits": 90, "target_gpa": 3.6, "remaining_credits": 30},
+        )
         m_sim.assert_called_once_with(
-            current_gpa=3.2,
-            current_credits=90,
-            target_gpa=3.6,
-            remaining_credits=30
+            current_gpa=3.2, current_credits=90, target_gpa=3.6, remaining_credits=30
         )
 
         await server.call_tool("get_tuition_fees", {})
@@ -210,7 +208,9 @@ def test_main_stdio(monkeypatch):
 
 
 def test_main_sse(monkeypatch):
-    monkeypatch.setattr(sys, "argv", ["server.py", "--transport", "sse", "--host", "0.0.0.0", "--port", "9999"])
+    monkeypatch.setattr(
+        sys, "argv", ["server.py", "--transport", "sse", "--host", "0.0.0.0", "--port", "9999"]
+    )
 
     def fake_run(coro):
         coro.close()
@@ -250,6 +250,7 @@ def test_dunder_main(monkeypatch):
 
 def test_server_health_route():
     from starlette.testclient import TestClient
+
     server = create_server()
     app = server.sse_app(sse_path="/sse", message_path="/messages/", host="127.0.0.1")
     client = TestClient(app, base_url="http://127.0.0.1:8000")
@@ -258,6 +259,3 @@ def test_server_health_route():
     data = response.json()
     assert data["status"] == "healthy"
     assert data["server"] == "sgu_academic_server"
-
-
-

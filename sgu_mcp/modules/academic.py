@@ -3,7 +3,8 @@ Module MCP Tools: Hồ sơ sinh viên, Bảng điểm & Học vụ SGU
 Gọi API thật từ thongtindaotao.sgu.edu.vn
 """
 
-from typing import Any, Optional
+from typing import Any
+
 from sgu_mcp.core.sgu_client import sgu_client
 
 
@@ -28,12 +29,12 @@ async def tool_get_student_profile() -> dict[str, Any]:
         "co_van_hoc_tap": {
             "ho_ten": data.get("ho_ten_cvht"),
             "email": data.get("email_cvht"),
-            "dien_thoai": data.get("dien_thoai_cvht")
-        }
+            "dien_thoai": data.get("dien_thoai_cvht"),
+        },
     }
 
 
-async def tool_get_semester_grades(semester_id: Optional[str] = None) -> dict[str, Any]:
+async def tool_get_semester_grades(semester_id: str | None = None) -> dict[str, Any]:
     """
     Lấy bảng điểm học tập chi tiết của sinh viên theo từng học kỳ từ hệ thống SGU.
     Bao gồm: Điểm quá trình, điểm thi, điểm tổng kết hệ 10, điểm hệ 4, điểm chữ và trạng thái đạt/không đạt.
@@ -41,7 +42,7 @@ async def tool_get_semester_grades(semester_id: Optional[str] = None) -> dict[st
     return await sgu_client.get_grades(semester_id=semester_id)
 
 
-async def tool_calculate_gpa_summary(semester_id: Optional[str] = None) -> dict[str, Any]:
+async def tool_calculate_gpa_summary(semester_id: str | None = None) -> dict[str, Any]:
     """
     Phân tích và tính toán tổng hợp kết quả học tập của sinh viên:
     - Tổng số tín chỉ đã học và đã tích lũy thành công.
@@ -81,22 +82,26 @@ async def tool_calculate_gpa_summary(semester_id: Optional[str] = None) -> dict[
         # Thu thập các môn nợ (nếu có)
         for m in sem.get("ds_diem_mon_hoc", []):
             if m.get("ket_qua") == 0 or m.get("diem_tk_chu") == "F":
-                failed_courses.append({
-                    "ten_mon": m.get("ten_mon"),
-                    "ma_mon": m.get("ma_mon"),
-                    "so_tc": m.get("so_tin_chi"),
-                    "hoc_ky": sem_name,
-                    "diem_tk": m.get("diem_tk")
-                })
+                failed_courses.append(
+                    {
+                        "ten_mon": m.get("ten_mon"),
+                        "ma_mon": m.get("ma_mon"),
+                        "so_tc": m.get("so_tin_chi"),
+                        "hoc_ky": sem_name,
+                        "diem_tk": m.get("diem_tk"),
+                    }
+                )
 
         if gpa_hk4:
-            semester_summaries.append({
-                "hoc_ky": sem_name,
-                "gpa_he_4": float(gpa_hk4),
-                "gpa_tich_luy": float(cum4) if cum4 else None,
-                "tin_chi_tich_luy": credits_accum,
-                "xep_loai": sem.get("xep_loai_tkb_hk")
-            })
+            semester_summaries.append(
+                {
+                    "hoc_ky": sem_name,
+                    "gpa_he_4": float(gpa_hk4),
+                    "gpa_tich_luy": float(cum4) if cum4 else None,
+                    "tin_chi_tich_luy": credits_accum,
+                    "xep_loai": sem.get("xep_loai_tkb_hk"),
+                }
+            )
 
     return {
         "gpa_tich_luy_he_4": cumulative_gpa_4,
@@ -107,11 +112,13 @@ async def tool_calculate_gpa_summary(semester_id: Optional[str] = None) -> dict[
         "so_mon_no": len(failed_courses),
         "danh_sach_mon_no": failed_courses,
         "tong_so_hoc_ky": len(semester_summaries),
-        "lich_su_hoc_ky": semester_summaries
+        "lich_su_hoc_ky": semester_summaries,
     }
 
 
-async def tool_simulate_target_gpa(current_gpa: float, current_credits: int, target_gpa: float, remaining_credits: int) -> dict[str, Any]:
+async def tool_simulate_target_gpa(
+    current_gpa: float, current_credits: int, target_gpa: float, remaining_credits: int
+) -> dict[str, Any]:
     """
     Thuật toán mô phỏng mục tiêu tốt nghiệp:
     Tính toán xem sinh viên cần đạt điểm trung bình hệ 4 bao nhiêu ở các môn còn lại để đạt mức xếp loại mong muốn (ví dụ: Xuất sắc >= 3.6, Giỏi >= 3.2, Khá >= 2.5).
@@ -125,7 +132,15 @@ async def tool_simulate_target_gpa(current_gpa: float, current_credits: int, tar
 
     is_achievable = required_avg_gpa <= 4.0
 
-    classification = "Xuất sắc" if target_gpa >= 3.6 else "Giỏi" if target_gpa >= 3.2 else "Khá" if target_gpa >= 2.5 else "Trung bình"
+    classification = (
+        "Xuất sắc"
+        if target_gpa >= 3.6
+        else "Giỏi"
+        if target_gpa >= 3.2
+        else "Khá"
+        if target_gpa >= 2.5
+        else "Trung bình"
+    )
 
     return {
         "gpa_hien_tai": current_gpa,
@@ -137,7 +152,7 @@ async def tool_simulate_target_gpa(current_gpa: float, current_credits: int, tar
         "co_kha_thi_khong": is_achievable,
         "loi_khuyen": (
             f"Mục tiêu KHẢ THI! Bạn cần duy trì điểm trung bình các môn tới là {round(required_avg_gpa, 2)} / 4.0."
-            if is_achievable else
-            f"Mục tiêu KHÔNG KHẢ THI về mặt toán học (cần đạt {round(required_avg_gpa, 2)} > 4.0). Bạn nên cân nhắc học cải thiện các môn điểm thấp."
-        )
+            if is_achievable
+            else f"Mục tiêu KHÔNG KHẢ THI về mặt toán học (cần đạt {round(required_avg_gpa, 2)} > 4.0). Bạn nên cân nhắc học cải thiện các môn điểm thấp."
+        ),
     }

@@ -7,38 +7,36 @@ Unit tests cho toàn bộ các module trong sgu_mcp/modules:
 Đảm bảo 100% statement & branch coverage
 """
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from datetime import datetime, date
-from unittest.mock import AsyncMock, patch, MagicMock
 
 from sgu_mcp.modules.academic import (
-    tool_get_student_profile,
-    tool_get_semester_grades,
     tool_calculate_gpa_summary,
+    tool_get_semester_grades,
+    tool_get_student_profile,
     tool_simulate_target_gpa,
 )
 from sgu_mcp.modules.exams import (
-    tool_get_exam_schedule,
     tool_get_exam_countdown,
+    tool_get_exam_schedule,
 )
 from sgu_mcp.modules.schedule import (
     parse_tkb_string,
-    tool_sgu_login,
-    tool_get_registered_courses,
-    tool_get_weekly_schedule,
-    tool_get_today_schedule,
     tool_check_schedule_conflict,
+    tool_get_registered_courses,
+    tool_get_today_schedule,
+    tool_get_weekly_schedule,
+    tool_sgu_login,
 )
 from sgu_mcp.modules.tuition import (
-    tool_get_tuition_fees,
-    tool_get_sgu_notifications,
     tool_get_course_offerings,
-    tool_check_prerequisites,
-    SGU_IT_PREREQUISITES,
+    tool_get_sgu_notifications,
+    tool_get_tuition_fees,
 )
 
-
 # ==================== ACADEMIC MODULE TESTS ====================
+
 
 @pytest.mark.asyncio
 async def test_tool_get_student_profile():
@@ -55,10 +53,12 @@ async def test_tool_get_student_profile():
             "nien_khoa": "2022-2026",
             "ho_ten_cvht": "TS. Nguyễn B",
             "email_cvht": "cvht@sgu.edu.vn",
-            "dien_thoai_cvht": "0901234567"
+            "dien_thoai_cvht": "0901234567",
         }
     }
-    with patch("sgu_mcp.modules.academic.sgu_client.get_student_info", new_callable=AsyncMock) as mock_get:
+    with patch(
+        "sgu_mcp.modules.academic.sgu_client.get_student_info", new_callable=AsyncMock
+    ) as mock_get:
         mock_get.return_value = mock_data
         profile = await tool_get_student_profile()
 
@@ -69,7 +69,9 @@ async def test_tool_get_student_profile():
 
 @pytest.mark.asyncio
 async def test_tool_get_semester_grades():
-    with patch("sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock) as mock_grades:
+    with patch(
+        "sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock
+    ) as mock_grades:
         mock_grades.return_value = {"code": 200, "data": []}
         res = await tool_get_semester_grades("20241")
         assert res["code"] == 200
@@ -95,7 +97,7 @@ async def test_tool_calculate_gpa_summary():
                             "so_tin_chi": 3,
                             "diem_tk": 4.0,
                             "ket_qua": 0,
-                            "diem_tk_chu": "D"
+                            "diem_tk_chu": "D",
                         },
                         {
                             "ten_mon": "Lập trình C",
@@ -103,7 +105,7 @@ async def test_tool_calculate_gpa_summary():
                             "so_tin_chi": 3,
                             "diem_tk": 2.0,
                             "ket_qua": 1,
-                            "diem_tk_chu": "F"
+                            "diem_tk_chu": "F",
                         },
                         {
                             "ten_mon": "Triết học",
@@ -111,9 +113,9 @@ async def test_tool_calculate_gpa_summary():
                             "so_tin_chi": 2,
                             "diem_tk": 8.5,
                             "ket_qua": 1,
-                            "diem_tk_chu": "A"
-                        }
-                    ]
+                            "diem_tk_chu": "A",
+                        },
+                    ],
                 },
                 {
                     "ten_hoc_ky": "Học kỳ 2 - Năm học 2023-2024",
@@ -122,7 +124,7 @@ async def test_tool_calculate_gpa_summary():
                     "dtb_tich_luy_he_10": None,
                     "so_tin_chi_dat_tich_luy": "invalid_credits",
                     "xep_loai_tkb_hk": "Khá",
-                    "ds_diem_mon_hoc": []
+                    "ds_diem_mon_hoc": [],
                 },
                 {
                     "ten_hoc_ky": "Học kỳ phụ",
@@ -130,12 +132,14 @@ async def test_tool_calculate_gpa_summary():
                     "dtb_tich_luy_he_4": None,
                     "dtb_tich_luy_he_10": None,
                     "so_tin_chi_dat_tich_luy": None,
-                    "ds_diem_mon_hoc": []
-                }
+                    "ds_diem_mon_hoc": [],
+                },
             ]
         }
     }
-    with patch("sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock) as mock_grades:
+    with patch(
+        "sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock
+    ) as mock_grades:
         mock_grades.return_value = mock_data
         summary = await tool_calculate_gpa_summary()
 
@@ -150,7 +154,9 @@ async def test_tool_calculate_gpa_summary():
 
 @pytest.mark.asyncio
 async def test_tool_calculate_gpa_summary_non_dict():
-    with patch("sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock) as mock_grades:
+    with patch(
+        "sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock
+    ) as mock_grades:
         mock_grades.return_value = {"data": None}
         summary = await tool_calculate_gpa_summary()
         assert summary["tong_so_hoc_ky"] == 0
@@ -171,10 +177,13 @@ async def test_tool_calculate_gpa_summary_invalid_credits():
             ]
         }
     }
-    with patch("sgu_mcp.modules.academic.sgu_client.get_grades", new_callable=AsyncMock, return_value=mock_data):
+    with patch(
+        "sgu_mcp.modules.academic.sgu_client.get_grades",
+        new_callable=AsyncMock,
+        return_value=mock_data,
+    ):
         summary = await tool_calculate_gpa_summary()
         assert summary["tong_tin_chi_tich_luy"] == 0
-
 
 
 @pytest.mark.asyncio
@@ -202,9 +211,12 @@ async def test_tool_simulate_target_gpa_edge_cases():
 
 # ==================== EXAMS MODULE TESTS ====================
 
+
 @pytest.mark.asyncio
 async def test_tool_get_exam_schedule():
-    with patch("sgu_mcp.modules.exams.sgu_client.get_exam_schedule", new_callable=AsyncMock) as mock_exam:
+    with patch(
+        "sgu_mcp.modules.exams.sgu_client.get_exam_schedule", new_callable=AsyncMock
+    ) as mock_exam:
         mock_exam.return_value = {"code": 200, "data": []}
         res = await tool_get_exam_schedule("20241")
         assert res["code"] == 200
@@ -220,33 +232,29 @@ async def test_tool_get_exam_countdown():
                 "ngay_thi": "20/12/2026",
                 "gio_thi": "08:00",
                 "phong_thi": "A.101",
-                "hinh_thuc_thi": "Tự luận"
+                "hinh_thuc_thi": "Tự luận",
             },
             {
                 "ten_mon_hoc": "Cơ sở dữ liệu",
                 "ngay": "20/12/2026",
                 "tiet_bat_dau": "7",
                 "ten_phong": "B.202",
-                "hinh_thuc_thi": "Trắc nghiệm"
+                "hinh_thuc_thi": "Trắc nghiệm",
             },
             {
                 "ngay_thi": "2026-12-25",
                 "gio_thi": "07:30",
                 "phong_thi": "C.303",
-                "hinh_thuc_thi": "Vấn đáp"
+                "hinh_thuc_thi": "Vấn đáp",
             },
-            {
-                "ten_mon": "Môn Thi Không Có Ngày",
-                "ngay_thi": None
-            },
-            {
-                "ten_mon": "Môn Thi Ngày Lỗi",
-                "ngay_thi": "invalid_date_format"
-            }
+            {"ten_mon": "Môn Thi Không Có Ngày", "ngay_thi": None},
+            {"ten_mon": "Môn Thi Ngày Lỗi", "ngay_thi": "invalid_date_format"},
         ]
     }
 
-    with patch("sgu_mcp.modules.exams.sgu_client.get_exam_schedule", new_callable=AsyncMock) as mock_exam:
+    with patch(
+        "sgu_mcp.modules.exams.sgu_client.get_exam_schedule", new_callable=AsyncMock
+    ) as mock_exam:
         mock_exam.return_value = mock_data
         countdown = await tool_get_exam_countdown()
 
@@ -256,10 +264,11 @@ async def test_tool_get_exam_countdown():
         assert "20/12/2026" in countdown["canh_bao_thi_don_dap"][0]
 
 
-
 @pytest.mark.asyncio
 async def test_tool_get_exam_countdown_non_list():
-    with patch("sgu_mcp.modules.exams.sgu_client.get_exam_schedule", new_callable=AsyncMock) as mock_exam:
+    with patch(
+        "sgu_mcp.modules.exams.sgu_client.get_exam_schedule", new_callable=AsyncMock
+    ) as mock_exam:
         mock_exam.return_value = {"data": None}
         countdown = await tool_get_exam_countdown()
         assert countdown["tong_so_mon_thi"] == 0
@@ -267,6 +276,7 @@ async def test_tool_get_exam_countdown_non_list():
 
 
 # ==================== SCHEDULE MODULE TESTS ====================
+
 
 def test_parse_tkb_string():
     # Empty
@@ -319,14 +329,16 @@ async def test_tool_get_registered_courses():
                         "so_tc": "3",
                         "nhom_to": "01",
                         "lop": "DCT1221",
-                        "tkb": "Thứ 2,tiết 1->3,Ph A.101,GV A,2026"
+                        "tkb": "Thứ 2,tiết 1->3,Ph A.101,GV A,2026",
                     },
-                    "trang_thai_mon": "Đã lưu vào CSDL"
+                    "trang_thai_mon": "Đã lưu vào CSDL",
                 }
             ]
         }
     }
-    with patch("sgu_mcp.modules.schedule.sgu_client.get_registered_courses", new_callable=AsyncMock) as mock_rc:
+    with patch(
+        "sgu_mcp.modules.schedule.sgu_client.get_registered_courses", new_callable=AsyncMock
+    ) as mock_rc:
         mock_rc.return_value = mock_data
         courses = await tool_get_registered_courses()
         assert courses["tong_so_mon"] == 1
@@ -349,7 +361,7 @@ async def test_tool_get_weekly_schedule():
                         "tiet_ket_thuc": 6,
                         "phong": "A.202",
                         "giang_vien": "GV B",
-                        "thoi_gian": "2026"
+                        "thoi_gian": "2026",
                     },
                     {
                         "thu_so": 2,
@@ -358,7 +370,7 @@ async def test_tool_get_weekly_schedule():
                         "tiet_ket_thuc": 3,
                         "phong": "A.201",
                         "giang_vien": "GV A",
-                        "thoi_gian": "2026"
+                        "thoi_gian": "2026",
                     },
                     {
                         "thu_so": 99,  # Invalid day
@@ -367,13 +379,15 @@ async def test_tool_get_weekly_schedule():
                         "tiet_ket_thuc": 1,
                         "phong": "",
                         "giang_vien": "",
-                        "thoi_gian": ""
-                    }
-                ]
+                        "thoi_gian": "",
+                    },
+                ],
             }
         ]
     }
-    with patch("sgu_mcp.modules.schedule.tool_get_registered_courses", new_callable=AsyncMock) as mock_trc:
+    with patch(
+        "sgu_mcp.modules.schedule.tool_get_registered_courses", new_callable=AsyncMock
+    ) as mock_trc:
         mock_trc.return_value = mock_courses
         weekly = await tool_get_weekly_schedule()
         thu_hai = next(d for d in weekly["thoi_khoa_bieu_tuan"] if d["thu"] == "Thứ Hai")
@@ -401,8 +415,14 @@ async def test_tool_get_today_schedule():
     mock_datetime = MagicMock()
     mock_datetime.now.return_value.weekday.return_value = 6
 
-    with patch("sgu_mcp.modules.schedule.datetime", mock_datetime), \
-         patch("sgu_mcp.modules.schedule.tool_get_weekly_schedule", new_callable=AsyncMock, return_value=weekly_mock):
+    with (
+        patch("sgu_mcp.modules.schedule.datetime", mock_datetime),
+        patch(
+            "sgu_mcp.modules.schedule.tool_get_weekly_schedule",
+            new_callable=AsyncMock,
+            return_value=weekly_mock,
+        ),
+    ):
         res = await tool_get_today_schedule()
         assert res["hom_nay"] == "Chủ Nhật"
         assert res["so_mon_hoc_hom_nay"] == 1
@@ -411,8 +431,14 @@ async def test_tool_get_today_schedule():
 
     # Case 2: Today is Monday (weekday = 0) -> today_weekday = 2, tomorrow_weekday = 3 (Thứ Ba)
     mock_datetime.now.return_value.weekday.return_value = 0
-    with patch("sgu_mcp.modules.schedule.datetime", mock_datetime), \
-         patch("sgu_mcp.modules.schedule.tool_get_weekly_schedule", new_callable=AsyncMock, return_value=weekly_mock):
+    with (
+        patch("sgu_mcp.modules.schedule.datetime", mock_datetime),
+        patch(
+            "sgu_mcp.modules.schedule.tool_get_weekly_schedule",
+            new_callable=AsyncMock,
+            return_value=weekly_mock,
+        ),
+    ):
         res2 = await tool_get_today_schedule()
         assert res2["hom_nay"] == "Thứ Hai"
         assert res2["lich_ngay_mai"]["ngay_mai"] == "Thứ Ba"
@@ -432,26 +458,35 @@ async def test_tool_check_schedule_conflict():
                         "tiet_bat_dau": 1,
                         "tiet_ket_thuc": 3,
                         "tiet_chu": "1->3",
-                        "phong": "A.101"
+                        "phong": "A.101",
                     }
-                ]
+                ],
             }
         ]
     }
-    with patch("sgu_mcp.modules.schedule.tool_get_registered_courses", new_callable=AsyncMock, return_value=mock_courses):
+    with patch(
+        "sgu_mcp.modules.schedule.tool_get_registered_courses",
+        new_callable=AsyncMock,
+        return_value=mock_courses,
+    ):
         # Case 1: Conflict on Tuesday (3), periods 2 to 4 (overlap on 2, 3)
-        res_conflict = await tool_check_schedule_conflict(target_thu=3, target_tiet_bd=2, target_so_tiet=3)
+        res_conflict = await tool_check_schedule_conflict(
+            target_thu=3, target_tiet_bd=2, target_so_tiet=3
+        )
         assert res_conflict["co_trung_lich"] is True
         assert res_conflict["so_lop_bi_trung"] == 1
         assert res_conflict["danh_sach_trung"][0]["tiet_bi_trung"] == [2, 3]
 
         # Case 2: No conflict on Tuesday (3), periods 4 to 6
-        res_no_conflict = await tool_check_schedule_conflict(target_thu=3, target_tiet_bd=4, target_so_tiet=3)
+        res_no_conflict = await tool_check_schedule_conflict(
+            target_thu=3, target_tiet_bd=4, target_so_tiet=3
+        )
         assert res_no_conflict["co_trung_lich"] is False
         assert res_no_conflict["so_lop_bi_trung"] == 0
 
 
 # ==================== TUITION MODULE TESTS ====================
+
 
 @pytest.mark.asyncio
 async def test_tool_get_tuition_fees():
@@ -465,7 +500,7 @@ async def test_tool_get_tuition_fees():
                     "phai_thu": "9,500,000",
                     "da_thu": "9,500,000",
                     "con_no": "0",
-                    "ghi_chu": ""
+                    "ghi_chu": "",
                 },
                 {
                     "ten_hoc_ky": "HK 2 2024-2025",
@@ -474,23 +509,28 @@ async def test_tool_get_tuition_fees():
                     "phai_thu": "10,200,000",
                     "da_thu": "5,000,000",
                     "con_no": "5,200,000",
-                    "ghi_chu": "Hạn đóng 30/03"
+                    "ghi_chu": "Hạn đóng 30/03",
                 },
-                {
-                    "ten_hoc_ky": "HK Phụ",
-                    "con_no": "invalid_num"
-                }
+                {"ten_hoc_ky": "HK Phụ", "con_no": "invalid_num"},
             ]
         }
     }
-    with patch("sgu_mcp.modules.tuition.sgu_client.get_tuition", new_callable=AsyncMock, return_value=mock_data):
+    with patch(
+        "sgu_mcp.modules.tuition.sgu_client.get_tuition",
+        new_callable=AsyncMock,
+        return_value=mock_data,
+    ):
         res = await tool_get_tuition_fees()
         assert res["tong_tien_no_hoc_phi"] == 5200000
         assert res["trang_thai_no"] == "Còn nợ học phí"
         assert len(res["chi_tiet_hoc_phi"]) == 3
 
     # Case 2: Zero debt & non-dict data
-    with patch("sgu_mcp.modules.tuition.sgu_client.get_tuition", new_callable=AsyncMock, return_value={"data": []}):
+    with patch(
+        "sgu_mcp.modules.tuition.sgu_client.get_tuition",
+        new_callable=AsyncMock,
+        return_value={"data": []},
+    ):
         res_zero = await tool_get_tuition_fees()
         assert res_zero["tong_tien_no_hoc_phi"] == 0
         assert res_zero["trang_thai_no"] == "Đã hoàn thành toàn bộ học phí"
@@ -506,18 +546,26 @@ async def test_tool_get_sgu_notifications():
                     "tieu_de": "Thông báo nghỉ Tết",
                     "ngay_gui": "01/01/2026",
                     "noi_dung": "Nghỉ tết theo quy định",
-                    "is_phai_xem": True
+                    "is_phai_xem": True,
                 }
             ]
         }
     }
-    with patch("sgu_mcp.modules.tuition.sgu_client.get_notifications", new_callable=AsyncMock, return_value=mock_data):
+    with patch(
+        "sgu_mcp.modules.tuition.sgu_client.get_notifications",
+        new_callable=AsyncMock,
+        return_value=mock_data,
+    ):
         res = await tool_get_sgu_notifications(limit=5)
         assert res["tong_thong_bao"] == 1
         assert res["danh_sach_thong_bao"][0]["tieu_de"] == "Thông báo nghỉ Tết"
 
     # Non-dict fallback
-    with patch("sgu_mcp.modules.tuition.sgu_client.get_notifications", new_callable=AsyncMock, return_value={"data": None}):
+    with patch(
+        "sgu_mcp.modules.tuition.sgu_client.get_notifications",
+        new_callable=AsyncMock,
+        return_value={"data": None},
+    ):
         res_none = await tool_get_sgu_notifications()
         assert res_none["tong_thong_bao"] == 0
 
@@ -536,7 +584,7 @@ async def test_tool_get_course_offerings():
                     "sl_dk": 45,
                     "sl_cp": 50,
                     "sl_cl": 5,
-                    "tkb": "Thứ 2"
+                    "tkb": "Thứ 2",
                 },
                 {
                     "ma_mon": "841402",
@@ -547,18 +595,26 @@ async def test_tool_get_course_offerings():
                     "sl_dk": 50,
                     "sl_cp": 50,
                     "sl_cl": 0,
-                    "tkb": "Thứ 3"
-                }
+                    "tkb": "Thứ 3",
+                },
             ]
         }
     }
-    with patch("sgu_mcp.modules.tuition.sgu_client.get_course_catalog", new_callable=AsyncMock, return_value=mock_data):
+    with patch(
+        "sgu_mcp.modules.tuition.sgu_client.get_course_catalog",
+        new_callable=AsyncMock,
+        return_value=mock_data,
+    ):
         res = await tool_get_course_offerings(page=1, limit=10)
         assert res["so_lop_tra_ve"] == 2
         assert res["danh_sach_lop_mo"][0]["con_cho"] is True
         assert res["danh_sach_lop_mo"][1]["con_cho"] is False
 
     # Non-dict fallback
-    with patch("sgu_mcp.modules.tuition.sgu_client.get_course_catalog", new_callable=AsyncMock, return_value={"data": None}):
+    with patch(
+        "sgu_mcp.modules.tuition.sgu_client.get_course_catalog",
+        new_callable=AsyncMock,
+        return_value={"data": None},
+    ):
         res_none = await tool_get_course_offerings()
         assert res_none["so_lop_tra_ve"] == 0

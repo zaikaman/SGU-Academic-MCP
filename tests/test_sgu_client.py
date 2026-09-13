@@ -3,11 +3,12 @@ Unit tests cho module SguApiClient (sgu_mcp/core/sgu_client.py)
 Mocking HTTP requests để kiểm thử toàn diện 100% các nhánh
 """
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
-import httpx
-from sgu_mcp.core.sgu_client import SguApiClient, sgu_client
+
 from sgu_mcp.config import settings
+from sgu_mcp.core.sgu_client import SguApiClient
 
 
 @pytest.mark.asyncio
@@ -57,7 +58,7 @@ async def test_login_success():
     mock_resp.json.return_value = {
         "access_token": "test_access_token",
         "name": "Nguyễn Văn A",
-        "expires_in": 7200
+        "expires_in": 7200,
     }
 
     with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
@@ -81,7 +82,7 @@ async def test_login_success_fullname_fallback():
     mock_resp.json.return_value = {
         "access_token": "test_token_2",
         "FullName": "Trần Thị B",
-        "expires_in": 3600
+        "expires_in": 3600,
     }
 
     with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
@@ -221,7 +222,9 @@ async def test_api_wrapper_methods(monkeypatch):
     mock_post.return_value = {"code": 200, "data": {"ma_sv": "3122410099"}}
     res = await client.get_student_info()
     assert res["data"]["ma_sv"] == "3122410099"
-    mock_post.assert_called_with("/api/dkmh/w-locsinhvieninfo", payload={}, cache_key="student_info_3122410099", ttl=86400)
+    mock_post.assert_called_with(
+        "/api/dkmh/w-locsinhvieninfo", payload={}, cache_key="student_info_3122410099", ttl=86400
+    )
 
     # get_registered_courses
     mock_post.return_value = {"code": 200, "data": {"ds_kqdkmh": []}}
@@ -271,4 +274,6 @@ async def test_get_student_info_no_current_student(monkeypatch):
     monkeypatch.setattr(client, "_post_api", mock_post)
 
     await client.get_student_info()
-    mock_post.assert_called_with("/api/dkmh/w-locsinhvieninfo", payload={}, cache_key="student_info_current", ttl=86400)
+    mock_post.assert_called_with(
+        "/api/dkmh/w-locsinhvieninfo", payload={}, cache_key="student_info_current", ttl=86400
+    )

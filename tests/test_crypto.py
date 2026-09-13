@@ -3,7 +3,7 @@ Unit tests cho module SguEncryptor (Mã hóa header 'ua' của SGU)
 """
 
 import base64
-import pytest
+
 from sgu_mcp.core.crypto import SguEncryptor
 
 
@@ -13,10 +13,12 @@ def test_isapi_extraction():
     assert enc.isapi("api/dkmh/w-locsinhvieninfo") == "DKMH/W-LOCSINHVIENINFO"
     assert enc.isapi("/api/auth/login") == "AUTH/LOGIN"
     assert enc.isapi("/api/web/w-locdstkbtuanusertheohocky") == "WEB/W-LOCDSTKBTUANUSERTHEOHOCKY"
-    assert enc.isapi("https://thongtindaotao.sgu.edu.vn/api/web/w-locdshocphisv") == "WEB/W-LOCDSHOCPHISV"
+    assert (
+        enc.isapi("https://thongtindaotao.sgu.edu.vn/api/web/w-locdshocphisv")
+        == "WEB/W-LOCDSHOCPHISV"
+    )
     assert enc.isapi("/not-an-endpoint") == ""
     assert enc.isapi("") == ""
-
 
 
 def test_ua_header_generation():

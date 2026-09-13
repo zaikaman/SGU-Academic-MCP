@@ -3,6 +3,7 @@ Unit tests cho logic xử lý của các MCP Tools (GPA Simulation, Prerequisite
 """
 
 import pytest
+
 from sgu_mcp.modules.academic import tool_simulate_target_gpa
 from sgu_mcp.modules.tuition import tool_check_prerequisites
 
@@ -11,10 +12,7 @@ from sgu_mcp.modules.tuition import tool_check_prerequisites
 async def test_simulate_target_gpa_achievable():
     # Hiện tại GPA 3.0 (60 tín chỉ), muốn đạt GPA 3.2 (còn 30 tín chỉ)
     res = await tool_simulate_target_gpa(
-        current_gpa=3.0,
-        current_credits=60,
-        target_gpa=3.2,
-        remaining_credits=30
+        current_gpa=3.0, current_credits=60, target_gpa=3.2, remaining_credits=30
     )
     assert res["co_kha_thi_khong"] is True
     # (3.2 * 90 - 3.0 * 60) / 30 = (288 - 180) / 30 = 108 / 30 = 3.6
@@ -26,10 +24,7 @@ async def test_simulate_target_gpa_achievable():
 async def test_simulate_target_gpa_impossible():
     # Hiện tại GPA 2.0 (100 tín chỉ), muốn đạt GPA 3.8 (còn 10 tín chỉ)
     res = await tool_simulate_target_gpa(
-        current_gpa=2.0,
-        current_credits=100,
-        target_gpa=3.8,
-        remaining_credits=10
+        current_gpa=2.0, current_credits=100, target_gpa=3.8, remaining_credits=10
     )
     assert res["co_kha_thi_khong"] is False
     assert res["diem_he_4_trung_binh_can_dat"] > 4.0
