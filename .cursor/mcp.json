@@ -10,7 +10,8 @@
       ],
       "cwd": "D:/CCNLTHD",
       "env": {
-        "PYTHONIOENCODING": "utf-8"
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUNBUFFERED": "1"
       }
     }
   }

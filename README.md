@@ -7,7 +7,7 @@
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> A production-grade **Model Context Protocol (MCP)** Server bridging AI Assistants (Claude Desktop, Antigravity, Cursor) directly with the **Saigon University (SGU) Academic Portal** (`thongtindaotao.sgu.edu.vn`).
+> A production-grade **Model Context Protocol (MCP)** Server bridging AI Assistants (Claude Desktop, Antigravity, VS Code, Cursor, Windsurf) directly with the **Saigon University (SGU) Academic Portal** (`thongtindaotao.sgu.edu.vn`).
 
 ---
 
@@ -32,7 +32,7 @@
 ```
 ┌────────────────────────────────────────────────────────┐
 │                   Trợ lý AI (Clients)                  │
-│       Claude Desktop  │  Cursor IDE  │   Antigravity   │
+│ Claude Desktop │ Antigravity │ VS Code │ Cursor │ CLI  │
 └───────────────────────────┬────────────────────────────┘
                             │ JSON-RPC (stdio / SSE)
                             ▼
@@ -117,34 +117,51 @@ SGU_STUDENT_ID=3122xxxxxx
 SGU_PASSWORD=MatKhauCuaBan
 ```
 
-**Bước 3: Tích hợp tự động vào AI Clients (1-Click)**
+**Bước 3: Tích hợp tự động vào MỌI IDE & AI Clients (Universal 1-Click)**
 Chạy script cài đặt tự động:
 ```bash
 python setup.py
 ```
 *(Trên Windows, bạn chỉ cần nhấp đúp chuột vào file `setup.bat`)*
 
-> **Script `setup.py` sẽ tự động:**
-> - Tự nhận diện đường dẫn tuyệt đối của Python và dự án trên máy bạn.
-> - Tự chèn cấu hình vào **Claude Desktop** (`%APPDATA%\Claude\claude_desktop_config.json`).
-> - Tự tạo cấu hình Workspace cho **Cursor / Antigravity** (`.cursor/mcp.json`).
-> 
-> Sau khi chạy xong, bạn chỉ cần mở Claude Desktop hoặc Cursor lên là 15 công cụ tra cứu SGU đã sẵn sàng trong khung chat!
+> **Script `setup.py` là bộ cấu hình tự động Universal đa nền tảng:**
+> - **Google Antigravity:** Tự động inject vào `~/.gemini/antigravity/mcp_config.json` và `~/.gemini/config/mcp_config.json`.
+> - **VS Code & GitHub Copilot Agent:** Tự tạo `.vscode/mcp.json` chuẩn chính thức ngay trong repo.
+> - **Cursor IDE:** Tự tạo workspace `.cursor/mcp.json` và cập nhật global nếu có.
+> - **Claude Desktop:** Tự chèn cấu hình vào file hệ thống (`%APPDATA%\Claude\claude_desktop_config.json` trên Windows, hoặc thư mục Application Support trên macOS).
+> - **Windsurf (Codeium):** Tự cấu hình vào `~/.codeium/windsurf/mcp_config.json`.
+> - **Cline / Roo Code:** Tự động phát hiện extension và ghi vào file cài đặt global storage.
+>
+> Sau khi chạy xong, chỉ cần mở bất kỳ IDE hoặc AI Client nào lên là toàn bộ 15 công cụ tra cứu SGU đã sẵn sàng trong khung chat!
+
+---
+
+### 3. Hướng dẫn dành cho CLI Tools (Terminal)
+
+Nếu bạn sử dụng các công cụ AI dạng dòng lệnh hoặc muốn kiểm thử trực tiếp:
+
+* **Claude Code CLI:**
+  ```bash
+  claude mcp add sgu_academic_server python -m sgu_mcp.server --transport stdio
+  ```
+* **MCP Inspector (Giao diện Web GUI trực quan để debug từng tool):**
+  ```bash
+  npx @modelcontextprotocol/inspector python -m sgu_mcp.server --transport stdio
+  ```
+* **Chạy trực tiếp Server (Stdio):**
+  ```bash
+  python -m sgu_mcp.server --transport stdio
+  ```
 
 ---
 
 <details>
 <summary><b>Cấu hình thủ công & Triển khai nâng cao (Docker, SSE, Manual JSON)</b></summary>
 
-### Chạy trực tiếp MCP Server qua dòng lệnh
-* Chế độ **stdio**:
-  ```bash
-  python -m sgu_mcp.server --transport stdio
-  ```
-* Chế độ **SSE** (HTTP Web Service):
-  ```bash
-  python -m sgu_mcp.server --transport sse --port 8000
-  ```
+### Chế độ SSE (HTTP Web Service cho mạng LAN hoặc Web Client)
+```bash
+python -m sgu_mcp.server --transport sse --port 8000
+```
 
 ### Triển khai với Docker
 ```bash
@@ -152,9 +169,9 @@ docker compose up -d --build
 ```
 Dịch vụ MCP Server sẽ chạy ở cổng `8000` (`http://localhost:8000/sse`).
 
-### Cấu hình thủ công file JSON (nếu không dùng `setup.py`)
+### Mẫu cấu hình thủ công JSON (Dành cho mọi Client)
 
-Thêm đoạn JSON sau vào `claude_desktop_config.json` hoặc `.cursor/mcp.json`:
+Cấu trúc JSON này tương thích 100% với Claude Desktop, Antigravity, VS Code, Cursor, Windsurf, v.v.:
 ```json
 {
   "mcpServers": {
@@ -168,7 +185,8 @@ Thêm đoạn JSON sau vào `claude_desktop_config.json` hoặc `.cursor/mcp.jso
       ],
       "cwd": "C:/path/to/sgu-academic-mcp",
       "env": {
-        "PYTHONIOENCODING": "utf-8"
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUNBUFFERED": "1"
       }
     }
   }
