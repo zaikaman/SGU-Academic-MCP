@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "sgu_academic_server": {
+      "command": "C:/Users/admin/AppData/Local/Programs/Python/Python312/python.exe",
+      "args": [
+        "-m",
+        "sgu_mcp.server",
+        "--transport",
+        "stdio"
+      ],
+      "cwd": "D:/CCNLTHD",
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}

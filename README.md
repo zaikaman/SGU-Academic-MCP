@@ -1,4 +1,4 @@
-# SGU Academic MCP Server 🎓🤖
+# SGU Academic MCP Server
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Protocol-purple.svg)](https://modelcontextprotocol.io/)
@@ -10,11 +10,11 @@
 
 ---
 
-## 📖 Giới thiệu
+## Giới thiệu
 
 **SGU Academic MCP Server** được xây dựng theo chuẩn mở [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) của Anthropic. Hệ thống đóng vai trò cầu nối thông minh (Bridge Middleware), giúp các Trợ lý AI có thể tương tác trực tiếp với dữ liệu học tập thực tế từ cổng thông tin đào tạo Đại học Sài Gòn (SGU) bằng ngôn ngữ tự nhiên.
 
-### ✨ Tính năng nổi bật
+### Tính năng nổi bật
 
 * **100% Dữ liệu thực tế:** Tích hợp trực tiếp với API cổng đào tạo SGU (`thongtindaotao.sgu.edu.vn`), không dùng dữ liệu giả lập.
 * **Cơ chế Reverse-Engineered Security:** Tự động tạo dynamic header `ua` với thuật toán mã hóa timestamp + XOR bitwise, tương thích hoàn toàn với cơ chế bảo mật của cổng đào tạo.
@@ -26,7 +26,7 @@
 
 ---
 
-## 🏛️ Kiến trúc hệ thống
+## Kiến trúc hệ thống
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -58,7 +58,7 @@
 
 ---
 
-## 🛠️ Danh mục năng lực MCP
+## Danh mục năng lực MCP
 
 ### 1. 15 MCP Tools (Hành động có thể gọi)
 
@@ -95,62 +95,65 @@
 
 ---
 
-## 🚀 Cài đặt và Sử dụng
+## Cài đặt & Sử dụng (1-Click Setup)
 
-### Yêu cầu môi trường
+### 1. Yêu cầu môi trường
 * Python 3.10 trở lên
-* Docker & Docker Compose *(tùy chọn)*
 
-### Cách 1: Chạy trực tiếp qua Python
+### 2. Các bước thiết lập
 
-1. **Clone repository:**
-   ```bash
-   git clone https://github.com/your-username/sgu-academic-mcp.git
-   cd sgu-academic-mcp
-   ```
+**Bước 1: Tải mã nguồn & cài đặt thư viện**
+```bash
+git clone https://github.com/your-username/sgu-academic-mcp.git
+cd sgu-academic-mcp
+pip install -r requirements.txt
+```
 
-2. **Cài đặt dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+**Bước 2: Cấu hình tài khoản sinh viên**
+Tạo file `.env` từ `.env.example` và điền tài khoản SGU của bạn:
+```env
+SGU_STUDENT_ID=3122xxxxxx
+SGU_PASSWORD=MatKhauCuaBan
+```
 
-3. **Cấu hình thông tin đăng nhập:**
-   Tạo file `.env` từ mẫu `.env.example`:
-   ```env
-   SGU_STUDENT_ID=3122xxxxxx
-   SGU_PASSWORD=MatKhauCuaBan
-   ```
+**Bước 3: Tích hợp tự động vào AI Clients (1-Click)**
+Chạy script cài đặt tự động:
+```bash
+python setup.py
+```
+*(Trên Windows, bạn chỉ cần nhấp đúp chuột vào file `setup.bat`)*
 
-4. **Khởi động MCP Server:**
-   * Chế độ **stdio** (khuyên dùng cho Claude Desktop, Cursor, Antigravity):
-     ```bash
-     python -m sgu_mcp.server --transport stdio
-     ```
-   * Chế độ **SSE** (dùng khi deploy qua mạng HTTP):
-     ```bash
-     python -m sgu_mcp.server --transport sse --port 8000
-     ```
+> **Script `setup.py` sẽ tự động:**
+> - Tự nhận diện đường dẫn tuyệt đối của Python và dự án trên máy bạn.
+> - Tự chèn cấu hình vào **Claude Desktop** (`%APPDATA%\Claude\claude_desktop_config.json`).
+> - Tự tạo cấu hình Workspace cho **Cursor / Antigravity** (`.cursor/mcp.json`).
+> 
+> Sau khi chạy xong, bạn chỉ cần mở Claude Desktop hoặc Cursor lên là 15 công cụ tra cứu SGU đã sẵn sàng trong khung chat!
 
 ---
 
-### Cách 2: Triển khai nhanh với Docker
+<details>
+<summary><b>Cấu hình thủ công & Triển khai nâng cao (Docker, SSE, Manual JSON)</b></summary>
 
+### Chạy trực tiếp MCP Server qua dòng lệnh
+* Chế độ **stdio**:
+  ```bash
+  python -m sgu_mcp.server --transport stdio
+  ```
+* Chế độ **SSE** (HTTP Web Service):
+  ```bash
+  python -m sgu_mcp.server --transport sse --port 8000
+  ```
+
+### Triển khai với Docker
 ```bash
 docker compose up -d --build
 ```
 Dịch vụ MCP Server sẽ chạy ở cổng `8000` (`http://localhost:8000/sse`).
 
----
+### Cấu hình thủ công file JSON (nếu không dùng `setup.py`)
 
-## 🔌 Hướng dẫn tích hợp AI Clients
-
-### 1. Claude Desktop
-
-Mở file cấu hình của Claude Desktop:
-* **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-* **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-Thêm cấu hình server:
+Thêm đoạn JSON sau vào `claude_desktop_config.json` hoặc `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
@@ -170,33 +173,11 @@ Thêm cấu hình server:
   }
 }
 ```
-
-### 2. Antigravity IDE / Cursor
-
-Cấu hình trong file `mcp_config.json` của workspace hoặc global:
-```json
-{
-  "mcpServers": {
-    "sgu_academic_server": {
-      "command": "python",
-      "args": [
-        "-m",
-        "sgu_mcp.server",
-        "--transport",
-        "stdio"
-      ],
-      "cwd": "C:/path/to/sgu-academic-mcp",
-      "env": {
-        "PYTHONIOENCODING": "utf-8"
-      }
-    }
-  }
-}
-```
+</details>
 
 ---
 
-## 🧪 Kiểm thử tự động (Unit Tests)
+## Kiểm thử tự động (Unit Tests)
 
 Dự án đi kèm bộ test tự động sử dụng `pytest`:
 
@@ -227,7 +208,7 @@ tests/test_tools_offline.py::test_check_prerequisites PASSED             [100%]
 
 ---
 
-## 📁 Cấu trúc thư mục
+## Cấu trúc thư mục
 
 ```
 sgu-academic-mcp/
@@ -260,7 +241,7 @@ sgu-academic-mcp/
 
 ---
 
-## 🔒 Bảo mật & Quyền riêng tư
+## Bảo mật & Quyền riêng tư
 
 * **Xử lý cục bộ (Local Execution):** Mọi thông tin đăng nhập và dữ liệu học tập cá nhân được xử lý hoàn toàn trên máy cục bộ của người dùng.
 * **Không lưu trữ tập trung:** Máy chủ không chuyển tiếp hoặc lưu trữ thông tin nhạy cảm lên bất kỳ server bên thứ ba nào.
@@ -268,7 +249,7 @@ sgu-academic-mcp/
 
 ---
 
-## 📜 Giấy phép (License)
+## Giấy phép (License)
 
 Dự án được phát hành theo giấy phép [MIT License](LICENSE).
 Tự do sử dụng, chỉnh sửa và tích hợp cho các mục đích học tập và nghiên cứu cá nhân.

@@ -9,7 +9,7 @@ Kỹ năng này trang bị cho Trợ lý AI năng lực tương tác và tra c�
 
 ---
 
-## 🎯 Khi nào kích hoạt kỹ năng này?
+## Khi nào kích hoạt kỹ năng này?
 
 Kích hoạt khi người dùng (sinh viên hoặc giảng viên SGU) yêu cầu:
 1. **Thời khóa biểu & Lịch học:**
@@ -30,7 +30,7 @@ Kích hoạt khi người dùng (sinh viên hoặc giảng viên SGU) yêu cầu
 
 ---
 
-## 🛠️ Hướng dẫn điều phối Tool (Tool Usage Guidelines)
+## Hướng dẫn điều phối Tool (Tool Usage Guidelines)
 
 | Mục đích của người dùng | Tool / Resource cần gọi |
 | :--- | :--- |
@@ -47,7 +47,7 @@ Kích hoạt khi người dùng (sinh viên hoặc giảng viên SGU) yêu cầu
 
 ---
 
-## 💡 Quy tắc ứng xử & Phản hồi (Tone & Behavior)
+## Quy tắc ứng xử & Phản hồi (Tone & Behavior)
 
 1. **Ngôn ngữ thân thiện, chuẩn học đường:**
    - Xưng hô "mình - bạn" hoặc "trợ lý học vụ - bạn".

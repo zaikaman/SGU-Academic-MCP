@@ -31,14 +31,14 @@ async def run_mcp_client():
 
             # 1. Liệt kê toàn bộ Tools
             tools = await session.list_tools()
-            print(f"\n✅ KẾT NỐI THÀNH CÔNG! Số lượng Tools: {len(tools.tools)}")
+            print(f"\n[OK] KẾT NỐI THÀNH CÔNG! Số lượng Tools: {len(tools.tools)}")
             for idx, t in enumerate(tools.tools[:5], 1):
                 print(f"   [{idx}] Tool: {t.name} -> {t.description}")
             print(f"   ... và {len(tools.tools) - 5} công cụ khác.")
 
             # 2. Gọi Tool: check_prerequisites
             print("\n" + "=" * 50)
-            print("🚀 THỬ NGHIỆM GỌI TOOL: check_prerequisites")
+            print("[TEST] THỬ NGHIỆM GỌI TOOL: check_prerequisites")
             print("=" * 50)
             res1 = await session.call_tool("check_prerequisites", {"course_name": "Lập trình mạng"})
             for c in res1.content:
@@ -47,7 +47,7 @@ async def run_mcp_client():
 
             # 3. Gọi Tool: simulate_target_gpa
             print("\n" + "=" * 50)
-            print("🚀 THỬ NGHIỆM GỌI TOOL: simulate_target_gpa")
+            print("[TEST] THỬ NGHIỆM GỌI TOOL: simulate_target_gpa")
             print("=" * 50)
             res2 = await session.call_tool("simulate_target_gpa", {
                 "current_gpa": 3.1,
@@ -61,7 +61,7 @@ async def run_mcp_client():
 
             # 4. Đọc Resource: sgu://graduation/standards
             print("\n" + "=" * 50)
-            print("📖 THỬ NGHIỆM ĐỌC RESOURCE: sgu://graduation/standards")
+            print("[TEST] THỬ NGHIỆM ĐỌC RESOURCE: sgu://graduation/standards")
             print("=" * 50)
             res_content = await session.read_resource("sgu://graduation/standards")
             for c in res_content.contents:
@@ -69,7 +69,7 @@ async def run_mcp_client():
 
             # 5. Đọc Prompt: graduation_audit
             print("\n" + "=" * 50)
-            print("💬 THỬ NGHIỆM ĐỌC PROMPT: graduation_audit")
+            print("[TEST] THỬ NGHIỆM ĐỌC PROMPT: graduation_audit")
             print("=" * 50)
             prompt_res = await session.get_prompt("graduation_audit")
             for msg in prompt_res.messages:

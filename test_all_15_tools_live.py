@@ -40,7 +40,7 @@ from sgu_mcp.config import settings
 
 async def run_master_test():
     print("=" * 75)
-    print("🚀 BẮT ĐẦU KIỂM THỬ TOÀN BỘ 15 MCP TOOLS TRÊN DỮ LIỆU LIVE SGU")
+    print("BẮT ĐẦU KIỂM THỬ TOÀN BỘ 15 MCP TOOLS TRÊN DỮ LIỆU LIVE SGU")
     print("=" * 75)
 
     success_count = 0
@@ -162,7 +162,7 @@ async def run_master_test():
     success_count += 1
 
     print("\n" + "=" * 75)
-    print(f"🎉 TẤT CẢ {success_count}/15 MCP TOOLS ĐÃ VƯỢT QUA KIỂM THỬ LIVE 100%!")
+    print(f"KẾT QUẢ: TẤT CẢ {success_count}/15 MCP TOOLS ĐÃ VƯỢT QUA KIỂM THỬ LIVE 100%!")
     print("=" * 75)
 
 
