@@ -8,6 +8,8 @@ import argparse
 import asyncio
 import sys
 from typing import Any, Optional
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 from mcp.server.mcpserver import MCPServer
 from sgu_mcp.config import settings
 from sgu_mcp.modules.academic import (
@@ -149,6 +151,16 @@ def create_server() -> MCPServer:
     @server.prompt(name="graduation_audit", description="Đối soát toàn diện điều kiện tốt nghiệp")
     def prompt_graduation_audit() -> str:
         return SGU_PROMPTS["graduation_audit"]["template"]
+
+    # ==================== ĐĂNG KÝ HEALTH CHECK ROUTE ====================
+
+    @server.custom_route("/health", methods=["GET"])
+    async def health_check(request: Request) -> JSONResponse:
+        return JSONResponse({
+            "status": "healthy",
+            "server": "sgu_academic_server",
+            "version": "1.0.0"
+        })
 
     return server
 
