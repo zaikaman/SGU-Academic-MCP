@@ -2,9 +2,8 @@
 Unit tests cho module SguCache (SQLite Caching)
 """
 
-import os
 import time
-import pytest
+
 from sgu_mcp.core.cache import SguCache
 
 
@@ -52,6 +51,7 @@ def test_cache_exceptions(tmp_path, monkeypatch):
     cache = SguCache(db_path=str(db_file))
 
     import sqlite3
+
     def mock_connect(*args, **kwargs):
         raise sqlite3.OperationalError("Simulated DB error")
 
@@ -68,4 +68,3 @@ def test_cache_exceptions(tmp_path, monkeypatch):
 
     # clear all should catch exception and pass
     cache.clear()
-

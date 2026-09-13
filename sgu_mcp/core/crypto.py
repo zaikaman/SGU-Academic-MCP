@@ -18,10 +18,46 @@ class SguEncryptor:
         self.cn = "%\\6SaCzTYFe~Wua?ak"
         self.a = "Phapix"
         raw_seed = [
-            0x3A, 0x2B, 0xC5, 0x85, 0x4, 0xA5, 0x6E, 0x3, 0x2C, 0xCA, 0xBA, 0x1C,
-            0x76, 0xB1, 0x20, 0x5E, 0xDB, 0x6, 0xC7, 0x1B, 0x65, 0xBF, 0x42, 0x73,
-            0xEA, 0x78, 0xA, 0xEC, 0x68, 0x6C, 0x4A, 0xF7, 0x44, 0xC6, 0x3E, 0xCB,
-            0x11, 0x66, 0xB9, 0x2A,
+            0x3A,
+            0x2B,
+            0xC5,
+            0x85,
+            0x4,
+            0xA5,
+            0x6E,
+            0x3,
+            0x2C,
+            0xCA,
+            0xBA,
+            0x1C,
+            0x76,
+            0xB1,
+            0x20,
+            0x5E,
+            0xDB,
+            0x6,
+            0xC7,
+            0x1B,
+            0x65,
+            0xBF,
+            0x42,
+            0x73,
+            0xEA,
+            0x78,
+            0xA,
+            0xEC,
+            0x68,
+            0x6C,
+            0x4A,
+            0xF7,
+            0x44,
+            0xC6,
+            0x3E,
+            0xCB,
+            0x11,
+            0x66,
+            0xB9,
+            0x2A,
         ]
         self.sc = raw_seed[-36:-4]
 
@@ -32,11 +68,13 @@ class SguEncryptor:
     def _ec(self, input_str: str, key: int) -> list[int]:
         reversed_key = self._rk(key)[::-1]
         char_codes = [ord(c) for c in input_str]
-        extended_key = (reversed_key * ((len(char_codes) // len(reversed_key)) + 1))[:len(char_codes)]
+        extended_key = (reversed_key * ((len(char_codes) // len(reversed_key)) + 1))[
+            : len(char_codes)
+        ]
         return [code ^ extended_key[i] for i, code in enumerate(char_codes)]
 
     def _mc(self, s: str, length: int, offset: int) -> str:
-        return s[-length:][:length - offset]
+        return s[-length:][: length - offset]
 
     def isapi(self, endpoint: str) -> str:
         """

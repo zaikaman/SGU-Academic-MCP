@@ -10,23 +10,65 @@ SGU_RESOURCES = {
         "name": "Chương trình đào tạo Kỹ sư Công nghệ Thông tin SGU",
         "mimeType": "application/json",
         "description": "Toàn bộ lộ trình 8 học kỳ và các môn học bắt buộc của khoa CNTT Trường ĐH Sài Gòn",
-        "content": json.dumps({
-            "truong": "Trường Đại học Sài Gòn (SGU)",
-            "khoa": "Công nghệ Thông tin",
-            "nganh": "Công nghệ Thông tin",
-            "he_dao_tao": "Kỹ sư chính quy",
-            "tong_tin_chi": 145,
-            "lo_trinh_hoc_ky": {
-                "Học kỳ 1": ["Nhập môn lập trình (3TC)", "Đại số tuyến tính (3TC)", "Giải tích 1 (3TC)", "Triết học Mác - Lênin (3TC)", "Tiếng Anh 1 (3TC)"],
-                "Học kỳ 2": ["Kỹ thuật lập trình (3TC)", "Cấu trúc rời rạc (3TC)", "Giải tích 2 (3TC)", "Vật lý đại cương (3TC)", "Tiếng Anh 2 (3TC)"],
-                "Học kỳ 3": ["Cấu trúc dữ liệu và giải thuật (4TC)", "Lập trình hướng đối tượng (3TC)", "Cơ sở dữ liệu (3TC)", "Xác suất thống kê (3TC)"],
-                "Học kỳ 4": ["Hệ điều hành (3TC)", "Mạng máy tính (3TC)", "Hệ quản trị cơ sở dữ liệu (3TC)", "Kiến trúc máy tính (3TC)"],
-                "Học kỳ 5": ["Công nghệ phần mềm (3TC)", "Lập trình mạng (3TC)", "Trí tuệ nhân tạo (3TC)", "An toàn thông tin (3TC)"],
-                "Học kỳ 6": ["Các công nghệ lập trình hiện đại (3TC)", "Phát triển ứng dụng Web nâng cao (3TC)", "Học máy (3TC)", "Điện toán đám mây (3TC)"],
-                "Học kỳ 7": ["Thực tập doanh nghiệp (4TC)", "Chuyên đề phát triển ứng dụng di động (3TC)", "Quản trị dự án CNTT (3TC)"],
-                "Học kỳ 8": ["Khóa luận tốt nghiệp (10TC) hoặc Học các môn chuyên đề tốt nghiệp thay thế (10TC)"]
-            }
-        }, ensure_ascii=False, indent=2)
+        "content": json.dumps(
+            {
+                "truong": "Trường Đại học Sài Gòn (SGU)",
+                "khoa": "Công nghệ Thông tin",
+                "nganh": "Công nghệ Thông tin",
+                "he_dao_tao": "Kỹ sư chính quy",
+                "tong_tin_chi": 145,
+                "lo_trinh_hoc_ky": {
+                    "Học kỳ 1": [
+                        "Nhập môn lập trình (3TC)",
+                        "Đại số tuyến tính (3TC)",
+                        "Giải tích 1 (3TC)",
+                        "Triết học Mác - Lênin (3TC)",
+                        "Tiếng Anh 1 (3TC)",
+                    ],
+                    "Học kỳ 2": [
+                        "Kỹ thuật lập trình (3TC)",
+                        "Cấu trúc rời rạc (3TC)",
+                        "Giải tích 2 (3TC)",
+                        "Vật lý đại cương (3TC)",
+                        "Tiếng Anh 2 (3TC)",
+                    ],
+                    "Học kỳ 3": [
+                        "Cấu trúc dữ liệu và giải thuật (4TC)",
+                        "Lập trình hướng đối tượng (3TC)",
+                        "Cơ sở dữ liệu (3TC)",
+                        "Xác suất thống kê (3TC)",
+                    ],
+                    "Học kỳ 4": [
+                        "Hệ điều hành (3TC)",
+                        "Mạng máy tính (3TC)",
+                        "Hệ quản trị cơ sở dữ liệu (3TC)",
+                        "Kiến trúc máy tính (3TC)",
+                    ],
+                    "Học kỳ 5": [
+                        "Công nghệ phần mềm (3TC)",
+                        "Lập trình mạng (3TC)",
+                        "Trí tuệ nhân tạo (3TC)",
+                        "An toàn thông tin (3TC)",
+                    ],
+                    "Học kỳ 6": [
+                        "Các công nghệ lập trình hiện đại (3TC)",
+                        "Phát triển ứng dụng Web nâng cao (3TC)",
+                        "Học máy (3TC)",
+                        "Điện toán đám mây (3TC)",
+                    ],
+                    "Học kỳ 7": [
+                        "Thực tập doanh nghiệp (4TC)",
+                        "Chuyên đề phát triển ứng dụng di động (3TC)",
+                        "Quản trị dự án CNTT (3TC)",
+                    ],
+                    "Học kỳ 8": [
+                        "Khóa luận tốt nghiệp (10TC) hoặc Học các môn chuyên đề tốt nghiệp thay thế (10TC)"
+                    ],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
     },
     "sgu://regulations/academic-warning": {
         "name": "Quy chế xử lý học vụ theo học chế tín chỉ SGU",
@@ -48,7 +90,7 @@ SGU_RESOURCES = {
   + Tổng số tín chỉ nợ vượt quá 24 tín chỉ.
 
 3. Buộc thôi học:
-- Sinh viên bị buộc thôi học nếu bị cảnh báo học vụ 2 lần liên tiếp hoặc tổng số lần cảnh báo vượt quá 3 lần trong toàn khóa học."""
+- Sinh viên bị buộc thôi học nếu bị cảnh báo học vụ 2 lần liên tiếp hoặc tổng số lần cảnh báo vượt quá 3 lần trong toàn khóa học.""",
     },
     "sgu://graduation/standards": {
         "name": "Chuẩn đầu ra tốt nghiệp SGU",
@@ -64,7 +106,7 @@ SGU_RESOURCES = {
 5. Giáo dục Quốc phòng & Giáo dục Thể chất:
    - Có chứng chỉ Giáo dục Quốc phòng - An ninh và hoàn thành các học phần Giáo dục Thể chất.
 6. Điểm rèn luyện:
-   - Điểm rèn luyện toàn khóa đạt từ loại Trung bình (>= 50 điểm) trở lên."""
+   - Điểm rèn luyện toàn khóa đạt từ loại Trung bình (>= 50 điểm) trở lên.""",
     },
     "sgu://campuses/directory": {
         "name": "Danh bạ các Cơ sở Trường Đại học Sài Gòn",
@@ -77,6 +119,6 @@ SGU_RESOURCES = {
 2. Cơ sở 1: 105 Bà Huyện Thanh Quan, Phường Võ Thị Sáu, Quận 3, TP.HCM.
    - Ký hiệu giảng đường: BHTQ (ví dụ: BHTQ.101, BHTQ.202).
 3. Cơ sở 2: 04 Tôn Đức Thắng, Phường Bến Nghé, Quận 1, TP.HCM.
-4. Cơ sở 3: 20 Ngô Thời Nhiệm, Phường Võ Thị Sáu, Quận 3, TP.HCM."""
-    }
+4. Cơ sở 3: 20 Ngô Thời Nhiệm, Phường Võ Thị Sáu, Quận 3, TP.HCM.""",
+    },
 }

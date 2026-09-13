@@ -1,0 +1,110 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sgu-academic-mcp"
+version = "1.0.0"
+description = "SGU Academic MCP Server - He thong MCP AI Gateway ket noi Cong Dao tao Dai hoc Sai Gon"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "zaikaman" }
+]
+dependencies = [
+    "mcp>=2.2.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
+    "httpx>=0.28.0",
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.30.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "pytest-cov>=5.0.0",
+    "bandit>=1.7.10",
+    "pip-audit>=2.7.3",
+]
+
+# ==================== RUFF CONFIGURATION ====================
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    ".coverage",
+    "data",
+    "dist",
+    "build",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (unused imports, variables, etc.)
+    "I",   # isort (import sorting)
+    "UP",  # pyupgrade (modern python syntax)
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+]
+ignore = [
+    "E501", # line length violations (handled by formatter)
+    "B008", # do not perform function calls in argument defaults (pydantic Field)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# ==================== MYPY CONFIGURATION ====================
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+show_error_codes = true
+ignore_missing_imports = true
+
+# ==================== PYTEST CONFIGURATION ====================
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+addopts = "-v --strict-markers"
+
+# ==================== COVERAGE CONFIGURATION ====================
+[tool.coverage.run]
+source = ["sgu_mcp"]
+branch = true
+omit = [
+    "tests/*",
+    "setup.py",
+    "demo.py",
+    "test_*.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "pass",
+]
