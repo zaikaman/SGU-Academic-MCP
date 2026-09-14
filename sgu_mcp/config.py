@@ -29,3 +29,5 @@ class Settings(BaseSettings):
 
 # Singleton instance
 settings = Settings()
+
+# [toansiuuu commit 5: fix typo in config timeout setting]
