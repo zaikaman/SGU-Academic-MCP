@@ -199,4 +199,4 @@ class SguApiClient:
 # Global SGU Client instance
 sgu_client = SguApiClient()
 
-# [toansiuuu commit 17: feat(client): add retry middleware on 40]
+# [sinhtoluudan commit 18: feat(client): add student profile parser]
