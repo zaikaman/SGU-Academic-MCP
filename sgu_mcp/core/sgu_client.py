@@ -199,4 +199,4 @@ class SguApiClient:
 # Global SGU Client instance
 sgu_client = SguApiClient()
 
-# [zaikaman commit 16: feat(client): implement login authentica]
+# [toansiuuu commit 17: feat(client): add retry middleware on 40]
