@@ -66,11 +66,11 @@ Kích hoạt khi người dùng (sinh viên hoặc giảng viên SGU) yêu cầu
 
 ## 4. MCP Resources (Dữ liệu tĩnh & Quy chế)
 
-Khi sinh viên cần tra cứu quy định hoặc lộ trình đào tạo, hãy đọc các MCP Resource tương ứng:
-- `sgu://curriculum/it-roadmap`: Khung chương trình đào tạo Kỹ sư CNTT SGU.
-- `sgu://regulations/academic-warning`: Quy chế cảnh báo học vụ, buộc thôi học của SGU.
-- `sgu://graduation/standards`: Chuẩn đầu ra tốt nghiệp SGU (Chứng chỉ TOEIC/IELTS, MOS/IC3, GDTC, GDQP).
-- `sgu://campuses/directory`: Danh bạ và địa chỉ các cơ sở đào tạo của SGU (Cơ sở chính 273 An Dương Vương, CS1 105 Bà Huyện Thanh Quan, CS2 04 Tôn Đức Thắng).
+- `sgu://curriculum/it-roadmap`: Toàn bộ lộ trình 9 học kỳ (4.5 năm, tối thiểu 152 tín chỉ) và khung chương trình Kỹ sư CNTT SGU.
+- `sgu://regulations/academic-warning`: Quy chế thang điểm 4, các khung cảnh cáo học vụ và điều kiện buộc thôi học của SGU.
+- `sgu://graduation/standards`: Chuẩn đầu ra tốt nghiệp Kỹ sư CNTT (tín chỉ, GPA >= 2.0, chuẩn ngoại ngữ VSTEP Bậc 3 / TOEIC 500-550, miễn chuẩn tin học cho SV CNTT).
+- `sgu://campuses/directory`: Danh bạ và địa chỉ các cơ sở đào tạo của SGU (Cơ sở chính 273 An Dương Vương, CS1 105 Bà Huyện Thanh Quan, CS2 04 Tôn Đức Thắng, CS3 20 Ngô Thời Nhiệm, KTX, TH Thực hành Sài Gòn) kèm quy tắc giải mã phòng học.
+
 
 ---
 

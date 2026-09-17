@@ -86,10 +86,10 @@
 
 ### 2. 4 MCP Resources (Tài nguyên đọc ngữ cảnh)
 
-* `sgu://curriculum/it-roadmap`: Toàn bộ lộ trình 8 học kỳ và khung chương trình ngành CNTT SGU.
-* `sgu://regulations/academic-warning`: Quy chế tính điểm hệ 4 và các khung cảnh cáo học vụ.
-* `sgu://graduation/standards`: Điều kiện xét tốt nghiệp (tín chỉ, chuẩn ngoại ngữ TOEIC 500/VSTEP, tin học).
-* `sgu://campuses/directory`: Danh bạ cơ sở và ký hiệu các phòng học tại trường Đại học Sài Gòn.
+* `sgu://curriculum/it-roadmap`: Toàn bộ lộ trình 9 học kỳ (4.5 năm) và khung chương trình Kỹ sư ngành CNTT SGU.
+* `sgu://regulations/academic-warning`: Quy chế tính điểm hệ 4, các khung cảnh cáo học vụ và điều kiện buộc thôi học.
+* `sgu://graduation/standards`: Điều kiện xét tốt nghiệp Kỹ sư CNTT (tín chỉ, chuẩn ngoại ngữ VSTEP Bậc 3 / TOEIC 500-550, miễn chuẩn tin học cho SV CNTT).
+* `sgu://campuses/directory`: Danh bạ các cơ sở đào tạo, ký hiệu giảng đường và quy tắc tra cứu phòng học tại SGU.
 
 ### 3. 3 MCP Prompts (Mẫu tác vụ AI định sẵn)
 

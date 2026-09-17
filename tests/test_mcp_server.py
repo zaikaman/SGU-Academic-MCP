@@ -58,11 +58,27 @@ async def test_server_resources_registration():
     for expected_uri in expected_resources:
         assert expected_uri in resource_uris, f"Resource '{expected_uri}' chưa được đăng ký!"
 
-    # Đọc nội dung cả 4 resources để đảm bảo 100% callbacks được gọi
-    for uri in expected_resources:
-        content = await server.read_resource(uri)
-        assert content is not None
-        assert len(str(content)) > 0
+    # Đọc nội dung cả 4 resources để đảm bảo 100% callbacks được gọi và nội dung chính xác
+    curriculum = await server.read_resource("sgu://curriculum/it-roadmap")
+    assert "Học kỳ 9" in str(curriculum)
+    assert "4,5 năm" in str(curriculum) or "4.5 năm" in str(curriculum)
+    assert "Kỹ sư" in str(curriculum)
+
+    warning = await server.read_resource("sgu://regulations/academic-warning")
+    assert "Cảnh báo học vụ" in str(warning)
+    assert "Buộc thôi học" in str(warning)
+    assert "thang điểm 4" in str(warning)
+
+    grad = await server.read_resource("sgu://graduation/standards")
+    assert "VSTEP" in str(grad)
+    assert "tốt nghiệp" in str(grad)
+    assert "TOEIC" in str(grad)
+
+    campuses = await server.read_resource("sgu://campuses/directory")
+    assert "273 An Dương Vương" in str(campuses)
+    assert "105 Bà Huyện Thanh Quan" in str(campuses)
+    assert "04 Tôn Đức Thắng" in str(campuses)
+
 
 
 @pytest.mark.asyncio
