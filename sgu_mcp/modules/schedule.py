@@ -220,4 +220,4 @@ async def tool_check_schedule_conflict(
         "danh_sach_trung": conflicts,
     }
 
-# [zaikaman commit 23: feat(schedule): implement get_weekly_sch]
+# [toansiuuu commit 24: feat(schedule): implement check_schedule]
