@@ -220,4 +220,4 @@ async def tool_check_schedule_conflict(
         "danh_sach_trung": conflicts,
     }
 
-# [toansiuuu commit 25: fix time overlap edge cases when period ]
+# [zaikaman commit 26: feat(schedule): add get_registered_cours]
