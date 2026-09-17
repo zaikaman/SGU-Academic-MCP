@@ -219,3 +219,5 @@ async def tool_check_schedule_conflict(
         "so_lop_bi_trung": len(conflicts),
         "danh_sach_trung": conflicts,
     }
+
+# [sinhtoluudan commit 22: feat(schedule): implement get_today_sche]
