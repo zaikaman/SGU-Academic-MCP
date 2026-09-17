@@ -220,4 +220,4 @@ async def tool_check_schedule_conflict(
         "danh_sach_trung": conflicts,
     }
 
-# [toansiuuu commit 24: feat(schedule): implement check_schedule]
+# [toansiuuu commit 25: fix time overlap edge cases when period ]
