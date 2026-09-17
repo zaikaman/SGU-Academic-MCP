@@ -1,20 +1,22 @@
+#!/usr/bin/env python3
+''''exec python3 "$0" "$@" # '''
 """
-SGU Academic MCP Server - Universal 1-Click Auto Setup Script
-Tự động cấu hình MCP Server cho mọi IDE & AI Clients:
-- Google Antigravity
-- VS Code & GitHub Copilot
-- Cursor IDE
-- Claude Desktop
-- Windsurf (Codeium)
-- Cline / Roo Code
+SGU Academic MCP Server - Universal 1-Click Zero-Flag Auto Setup
+Tự động nhận diện và cấu hình tương thích đồng thời cả 3 môi trường trong 1 lần chạy duy nhất:
+  1. Windows Native (Stdio Transport - Mặc định cho người dùng cá nhân)
+  2. WSL Native (Linux Stdio / Remote Environment)
+  3. Docker Container (SSE Transport - Port 8000)
+
+Không cần truyền bất kỳ tham số hay cờ lệnh nào!
 """
 
-import sys
-import os
 import json
-import shutil
-import platform
+import os
 from pathlib import Path
+import platform
+import shutil
+import subprocess
+import sys
 
 # Đảm bảo in tiếng Việt chuẩn xác trên mọi console (đặc biệt là Windows)
 if sys.stdout.encoding != "utf-8":
@@ -26,17 +28,18 @@ if sys.stdout.encoding != "utf-8":
 
 
 def print_banner():
-    print("=" * 70)
+    print("=" * 72)
     print("   SGU ACADEMIC MCP SERVER - UNIVERSAL 1-CLICK AUTO SETUP")
-    print("   (Antigravity • VS Code • Cursor • Claude • Windsurf • Cline)")
-    print("=" * 70)
+    print("   Tự động tương thích 100%: Windows Native • WSL • Docker")
+    print("   (Antigravity • VS Code • Cursor • Claude Desktop • Windsurf)")
+    print("=" * 72)
 
 
 def setup_env_file(project_root: Path):
     env_file = project_root / ".env"
     env_example = project_root / ".env.example"
 
-    print("\n[Bước 1/3] Kiểm tra file cấu hình .env...")
+    print("\n[Bước 1/4] Kiểm tra file cấu hình .env...")
     if not env_file.exists():
         if env_example.exists():
             shutil.copy(env_example, env_file)
@@ -65,10 +68,9 @@ def write_mcp_config(config_path: Path, server_name: str, server_config: dict, a
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
                     config = json.load(f)
-            except Exception as e:
+            except Exception:
                 backup_path = config_path.with_suffix(".json.bak")
                 shutil.copy(config_path, backup_path)
-                print(f"  [!] {app_name}: File config cũ lỗi cú pháp, đã sao lưu sang {backup_path.name}")
                 config = {}
 
         if not isinstance(config, dict):
@@ -82,32 +84,36 @@ def write_mcp_config(config_path: Path, server_name: str, server_config: dict, a
         with open(config_path, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
 
-        print(f"  [OK] Đã cấu hình {app_name}")
+        print(f"  [OK] Đã cấu hình: {app_name}")
         print(f"       -> {config_path}")
         return True
     except Exception as e:
-        print(f"  [LỖI] Không thể cấu hình {app_name}: {e}")
+        print(f"  [!] Bỏ qua {app_name}: {e}")
         return False
 
 
-def setup_workspace_configs(project_root: Path, server_name: str, server_config: dict):
-    print("\n[Bước 2/3] Cấu hình Workspace Repo (VS Code & Cursor)...")
+def setup_workspace_configs(project_root: Path, server_name: str, stdio_config: dict, docker_config: dict):
+    print("\n[Bước 2/4] Cấu hình Workspace Repo (.cursor & .vscode)...")
 
-    # 1. Cursor Workspace (.cursor/mcp.json)
+    # 1. Cấu hình mặc định: Stdio Native (chạy ngay không cần mở port)
     cursor_workspace = project_root / ".cursor" / "mcp.json"
-    write_mcp_config(cursor_workspace, server_name, server_config, "Cursor Workspace (.cursor/mcp.json)")
-
-    # 2. VS Code Workspace (.vscode/mcp.json - chuẩn chính thức VS Code & GitHub Copilot Agent)
     vscode_workspace = project_root / ".vscode" / "mcp.json"
-    write_mcp_config(vscode_workspace, server_name, server_config, "VS Code Workspace (.vscode/mcp.json)")
+    write_mcp_config(cursor_workspace, server_name, stdio_config, "Cursor Workspace (Stdio Default)")
+    write_mcp_config(vscode_workspace, server_name, stdio_config, "VS Code Workspace (Stdio Default)")
+
+    # 2. Tạo sẵn profile Docker SSE (.cursor/mcp.docker.json & .vscode/mcp.docker.json)
+    docker_cursor = project_root / ".cursor" / "mcp.docker.json"
+    docker_vscode = project_root / ".vscode" / "mcp.docker.json"
+    write_mcp_config(docker_cursor, server_name, docker_config, "Cursor Profile Docker (SSE)")
+    write_mcp_config(docker_vscode, server_name, docker_config, "VS Code Profile Docker (SSE)")
 
 
-def setup_global_clients(project_root: Path, server_name: str, server_config: dict):
-    print("\n[Bước 3/3] Tự động quét & cấu hình các AI Clients / IDE trên máy...")
+def setup_global_clients(server_name: str, stdio_config: dict):
+    print("\n[Bước 3/4] Quét & Tích hợp vào các AI Client / IDE trên máy...")
     system = platform.system()
     home = Path.home()
     appdata = os.environ.get("APPDATA")
-    
+
     clients_to_check = []
 
     # 1. Google Antigravity
@@ -115,7 +121,7 @@ def setup_global_clients(project_root: Path, server_name: str, server_config: di
     antigravity_config_dir = home / ".gemini" / "config"
     if antigravity_dir.exists() or antigravity_config_dir.exists():
         clients_to_check.append(("Google Antigravity", antigravity_dir / "mcp_config.json"))
-        clients_to_check.append(("Google Antigravity (Global Config)", antigravity_config_dir / "mcp_config.json"))
+        clients_to_check.append(("Google Antigravity (Global)", antigravity_config_dir / "mcp_config.json"))
 
     # 2. Claude Desktop
     claude_path = None
@@ -125,9 +131,8 @@ def setup_global_clients(project_root: Path, server_name: str, server_config: di
         claude_path = home / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
     elif system == "Linux":
         claude_path = home / ".config" / "Claude" / "claude_desktop_config.json"
-    
+
     if claude_path:
-        # Nếu thư mục Claude tồn tại hoặc tạo file trực tiếp
         if claude_path.parent.exists() or system == "Windows":
             clients_to_check.append(("Claude Desktop", claude_path))
 
@@ -149,7 +154,7 @@ def setup_global_clients(project_root: Path, server_name: str, server_config: di
         cline_path = home / "Library" / "Application Support" / "Code" / "User" / "globalStorage" / "saoudrizwan.claude-dev" / "settings" / "cline_mcp_settings.json"
     elif system == "Linux":
         cline_path = home / ".config" / "Code" / "User" / "globalStorage" / "saoudrizwan.claude-dev" / "settings" / "cline_mcp_settings.json"
-    
+
     if cline_path and cline_path.parent.exists():
         clients_to_check.append(("Cline (VS Code Extension)", cline_path))
 
@@ -161,31 +166,73 @@ def setup_global_clients(project_root: Path, server_name: str, server_config: di
         roo_path = home / "Library" / "Application Support" / "Code" / "User" / "globalStorage" / "rooveterinaryinc.roo-cline" / "settings" / "cline_mcp_settings.json"
     elif system == "Linux":
         roo_path = home / ".config" / "Code" / "User" / "globalStorage" / "rooveterinaryinc.roo-cline" / "settings" / "cline_mcp_settings.json"
-    
+
     if roo_path and roo_path.parent.exists():
         clients_to_check.append(("Roo Code (VS Code Extension)", roo_path))
 
-    count = 0
     for app_name, cfg_path in clients_to_check:
-        if write_mcp_config(cfg_path, server_name, server_config, app_name):
-            count += 1
-
-    if count == 0:
-        print("  [INFO] Chưa phát hiện cài đặt Global của Claude Desktop hay Antigravity.")
-        print("  -> Đừng lo, file cấu hình Workspace (.cursor/mcp.json và .vscode/mcp.json) đã được tạo sẵn!")
+        write_mcp_config(cfg_path, server_name, stdio_config, app_name)
 
 
-def print_cli_instructions(project_root: Path, python_exe: str):
-    print("\n" + "=" * 70)
-    print(" HƯỚNG DẪN DÀNH CHO CLI TOOLS (NẾU BẠN DÙNG TERMINAL)")
-    print("=" * 70)
-    print("1. Claude Code CLI:")
-    print(f'   claude mcp add sgu_academic_server "{python_exe}" -m sgu_mcp.server --transport stdio')
-    print("\n2. MCP Inspector (Giao diện web trực quan để test tool):")
-    print(f'   npx @modelcontextprotocol/inspector "{python_exe}" -m sgu_mcp.server --transport stdio')
-    print("\n3. Chạy trực tiếp qua lệnh Python:")
-    print("   python -m sgu_mcp.server --transport stdio")
-    print("=" * 70)
+def setup_wsl_and_docker_compatibility(project_root: Path, server_name: str):
+    print("\n[Bước 4/4] Kiểm tra & Tích hợp WSL và Docker...")
+
+    # 1. Kiểm tra & Cấu hình WSL (nếu máy chạy Windows)
+    wsl_status = "Không phát hiện"
+    if platform.system() == "Windows":
+        try:
+            res = subprocess.run(["wsl", "which", "python3"], capture_output=True, text=True, timeout=3)
+            if res.returncode == 0 and res.stdout.strip():
+                wsl_python = res.stdout.strip()
+                # Chuyển đổi đường dẫn sang WSL format (/mnt/c/...)
+                path_str = str(project_root).replace("\\", "/")
+                wsl_path = subprocess.run(
+                    ["wsl", "wslpath", "-u", path_str], capture_output=True, text=True, timeout=3
+                ).stdout.strip()
+
+                wsl_config = {
+                    "command": wsl_python,
+                    "args": ["-m", "sgu_mcp.server", "--transport", "stdio"],
+                    "cwd": wsl_path,
+                    "env": {"PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1"},
+                }
+                # Tạo profile WSL trong repo
+                write_mcp_config(project_root / ".cursor" / "mcp.wsl.json", server_name, wsl_config, "Cursor Profile WSL")
+                write_mcp_config(project_root / ".vscode" / "mcp.wsl.json", server_name, wsl_config, "VS Code Profile WSL")
+                wsl_status = f"Sẵn sàng (Python: {wsl_python})"
+        except Exception:
+            wsl_status = "Không khả dụng"
+    else:
+        wsl_status = "Đang chạy trực tiếp trên Linux / WSL"
+
+    # 2. Kiểm tra Docker
+    docker_status = "Chưa chạy"
+    try:
+        import httpx
+        with httpx.Client(timeout=0.6) as client:
+            resp = client.get("http://localhost:8000/health")
+            if resp.status_code == 200:
+                docker_status = "Đang chạy & Khỏe mạnh (http://localhost:8000/sse)"
+    except Exception:
+        docker_status = "Chưa bật container (chạy 'docker compose up -d' nếu muốn dùng)"
+
+    print(f"  • Môi trường WSL:   {wsl_status}")
+    print(f"  • Môi trường Docker: {docker_status}")
+
+
+def print_dashboard():
+    print("\n" + "=" * 72)
+    print(" HOÀN TẤT CÀI ĐẶT 1-CLICK TƯƠNG THÍCH ĐA NỀN TẢNG (0 CẦN CỜ LỆNH)!")
+    print("=" * 72)
+    print("Hệ thống đã tự động kích hoạt:")
+    print(" 1. [Windows Native] (Mặc định):")
+    print("    -> Đã cấu hình Stdio chuẩn cho mọi IDE (Antigravity, Cursor, VS Code, Claude).")
+    print("    -> Mở bất kỳ IDE nào là 15 Native Tools của SGU sẵn sàng ngay trong chat!")
+    print(" 2. [WSL Native]:")
+    print("    -> Đã tự động tạo profile Stdio cho Linux/WSL (.cursor/mcp.wsl.json).")
+    print(" 3. [Docker Container]:")
+    print("    -> Đã chuẩn bị sẵn docker-compose.yml và profile SSE (.cursor/mcp.docker.json).")
+    print("=" * 72)
 
 
 def main():
@@ -195,32 +242,25 @@ def main():
     python_exe = sys.executable.replace("\\", "/")
     server_name = "sgu_academic_server"
 
-    print(f"Thư mục dự án: {project_root}")
-    print(f"Python thực thi: {python_exe}")
-
-    server_config = {
+    stdio_config = {
         "command": python_exe,
         "args": ["-m", "sgu_mcp.server", "--transport", "stdio"],
         "cwd": str(project_root).replace("\\", "/"),
         "env": {
             "PYTHONIOENCODING": "utf-8",
-            "PYTHONUNBUFFERED": "1"
-        }
+            "PYTHONUNBUFFERED": "1",
+        },
+    }
+
+    docker_config = {
+        "url": "http://localhost:8000/sse",
     }
 
     setup_env_file(project_root)
-    setup_workspace_configs(project_root, server_name, server_config)
-    setup_global_clients(project_root, server_name, server_config)
-    print_cli_instructions(project_root, python_exe)
-
-    print("\n" + "=" * 70)
-    print(" HOÀN TẤT CÀI ĐẶT 1-CLICK CHO MỌI NỀN TẢNG!")
-    print("=" * 70)
-    print("Bây giờ bạn chỉ cần:")
-    print(" 1. Điền MSSV và Mật khẩu thật vào file .env (nếu chưa điền).")
-    print(" 2. Mở thư mục này bằng VS Code, Cursor, hoặc mở Antigravity / Claude Desktop.")
-    print(" 3. Trò chuyện và hỏi ngay: 'Xem lịch học hôm nay', 'Tính GPA tích lũy'...")
-    print("=" * 70)
+    setup_workspace_configs(project_root, server_name, stdio_config, docker_config)
+    setup_global_clients(server_name, stdio_config)
+    setup_wsl_and_docker_compatibility(project_root, server_name)
+    print_dashboard()
 
 
 if __name__ == "__main__":

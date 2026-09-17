@@ -94,8 +94,6 @@ branch = true
 omit = [
     "tests/*",
     "setup.py",
-    "demo.py",
-    "test_*.py",
 ]
 
 [tool.coverage.report]

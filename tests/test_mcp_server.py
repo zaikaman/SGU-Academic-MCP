@@ -236,6 +236,28 @@ def test_main_win32_reconfigure_exception(monkeypatch):
         assert mock_run.called
 
 
+def test_main_win32_no_stdout_reconfigure(monkeypatch):
+    monkeypatch.setattr(sys, "platform", "win32")
+    monkeypatch.setattr(sys, "argv", ["server.py", "--transport", "stdio"])
+
+    mock_stdin = MagicMock()
+    mock_stdin.reconfigure = MagicMock()
+    monkeypatch.setattr(sys, "stdin", mock_stdin)
+
+    class DummyStdout:
+        pass
+
+    monkeypatch.setattr(sys, "stdout", DummyStdout())
+
+    def fake_run(coro):
+        coro.close()
+
+    with patch("asyncio.run", side_effect=fake_run) as mock_run:
+        main()
+        assert mock_run.called
+
+
+
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_dunder_main(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["server.py", "--transport", "stdio"])
@@ -259,3 +281,16 @@ def test_server_health_route():
     data = response.json()
     assert data["status"] == "healthy"
     assert data["server"] == "sgu_academic_server"
+
+
+def test_main_non_win32(monkeypatch):
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(sys, "argv", ["server.py", "--transport", "stdio"])
+
+    def fake_run(coro):
+        coro.close()
+
+    with patch("asyncio.run", side_effect=fake_run) as mock_run:
+        main()
+        assert mock_run.called
+

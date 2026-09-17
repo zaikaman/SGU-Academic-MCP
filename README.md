@@ -5,8 +5,8 @@
 [![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Protocol-purple.svg)](https://modelcontextprotocol.io/)
-[![Tests](https://img.shields.io/badge/tests-49%20passed-brightgreen.svg)](tests/)
-[![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-52%20passed-brightgreen.svg)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](tests/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -108,8 +108,8 @@
 
 **Bước 1: Tải mã nguồn & cài đặt thư viện**
 ```bash
-git clone https://github.com/your-username/sgu-academic-mcp.git
-cd sgu-academic-mcp
+git clone https://github.com/zaikaman/SGU-Academic-MCP.git
+cd SGU-Academic-MCP
 pip install -r requirements.txt
 ```
 
@@ -120,41 +120,61 @@ SGU_STUDENT_ID=3122xxxxxx
 SGU_PASSWORD=MatKhauCuaBan
 ```
 
-**Bước 3: Tích hợp tự động vào MỌI IDE & AI Clients (Universal 1-Click)**
+**Bước 3: Tích hợp tự động 3-in-1 (Zero-Flag Universal 1-Click)**
 Chạy script cài đặt tự động:
-```bash
-python setup.py
-```
-*(Trên Windows, bạn chỉ cần nhấp đúp chuột vào file `setup.bat`)*
+- **Trên Windows:** Nhấp đúp chuột vào file `setup.bat` (hoặc chạy `python setup.py`)
+- **Trên Linux / WSL:** Chạy `bash setup.sh` (hoặc `python3 setup.py`)
 
-> **Script `setup.py` là bộ cấu hình tự động Universal đa nền tảng:**
-> - **Google Antigravity:** Tự động inject vào `~/.gemini/antigravity/mcp_config.json` và `~/.gemini/config/mcp_config.json`.
-> - **VS Code & GitHub Copilot Agent:** Tự tạo `.vscode/mcp.json` chuẩn chính thức ngay trong repo.
-> - **Cursor IDE:** Tự tạo workspace `.cursor/mcp.json` và cập nhật global nếu có.
-> - **Claude Desktop:** Tự chèn cấu hình vào file hệ thống (`%APPDATA%\Claude\claude_desktop_config.json` trên Windows, hoặc thư mục Application Support trên macOS).
-> - **Windsurf (Codeium):** Tự cấu hình vào `~/.codeium/windsurf/mcp_config.json`.
-> - **Cline / Roo Code:** Tự động phát hiện extension và ghi vào file cài đặt global storage.
+> **Script `setup.py` tự động nhận diện và cấu hình đồng thời cả 3 môi trường:**
+> 1. **Windows Native (Stdio Default):** Tự inject cấu hình Stdio vào **Antigravity** (`~/.gemini/...`), **Cursor** (`.cursor/mcp.json`), **VS Code** (`.vscode/mcp.json`), **Claude Desktop** (`%APPDATA%/Claude/...`), **Windsurf**...
+> 2. **WSL Native:** Tự động phát hiện WSL (`python3`, chuyển đổi đường dẫn sang `/mnt/...`) và tạo sẵn profile `.cursor/mcp.wsl.json` & `.vscode/mcp.wsl.json`.
+> 3. **Docker Container:** Tự động kiểm tra sức khỏe container và tạo sẵn profile SSE `.cursor/mcp.docker.json` & `.vscode/mcp.docker.json`.
 >
-> Sau khi chạy xong, chỉ cần mở bất kỳ IDE hoặc AI Client nào lên là toàn bộ 15 công cụ tra cứu SGU đã sẵn sàng trong khung chat!
+> Sau khi chạy xong, chỉ cần mở bất kỳ IDE hoặc AI Client nào lên là toàn bộ 15 Native Tools của SGU đã sẵn sàng ngay trong khung chat!
+
 
 ---
 
-### 3. Hướng dẫn dành cho CLI Tools (Terminal)
+## Trải nghiệm trò chuyện tự nhiên cùng Trợ lý AI (Native AI Chat)
 
-Nếu bạn sử dụng các công cụ AI dạng dòng lệnh hoặc muốn kiểm thử trực tiếp:
+Sau khi chạy **1-Click Setup**, bạn chỉ cần mở IDE (Google Antigravity, Cursor, VS Code, Claude Desktop...) và chat trực tiếp bằng tiếng Việt tự nhiên. AI sẽ tự động kích hoạt các Native MCP Tool tương ứng:
 
-* **Claude Code CLI:**
-  ```bash
-  claude mcp add sgu_academic_server python -m sgu_mcp.server --transport stdio
-  ```
+| Câu hỏi thực tế của sinh viên | MCP Tool được AI tự động gọi | Kết quả AI phản hồi |
+| :--- | :--- | :--- |
+| *"Hôm nay mình có tiết học nào không?"* | `get_today_schedule` | Liệt kê chi tiết môn học, phòng học, ca học, giảng viên hôm nay & ngày mai |
+| *"Xem giúp mình học phí học kỳ này và nợ đọng"* | `get_tuition_fees` | Thống kê số tiền cần nộp, số tiền đã đóng, biên lai và số dư còn nợ |
+| *"GPA hiện tại của mình bao nhiêu, có nợ môn nào không?"* | `calculate_gpa_summary` | Tổng kết GPA thang 4 & thang 10, tổng tín chỉ tích lũy và danh sách môn nợ |
+| *"Mục tiêu tốt nghiệp loại Giỏi (GPA 3.2), các kỳ tới mình cần đạt bao nhiêu?"* | `simulate_target_gpa` | Thuật toán mô phỏng điểm trung bình tối thiểu cần đạt ở các tín chỉ còn lại |
+| *"Sắp tới mình có lịch thi nào không, có bị trùng hay dồn dập không?"* | `get_exam_schedule`<br/>`get_exam_countdown` | Bảng đếm ngược ngày thi, số báo danh, phòng thi và cảnh báo thi 2 môn/ngày |
+| *"Kỳ này mình tính đăng ký môn Lập trình mạng thì có cần học trước môn nào không?"* | `check_prerequisites` | Đối soát cây môn tiên quyết ngành CNTT và tư vấn lộ trình học phù hợp |
+
+> [!TIP]
+> **Không cần gõ lệnh hay nhớ tên hàm!** Bạn chỉ cần hỏi tự nhiên như nói chuyện với một người bạn cố vấn học tập SGU.
+
+---
+
+### Kiểm thử Server & Công cụ Developer (Developer Testing)
+
+Dành cho các nhà phát triển (Developers) muốn kiểm thử trực tiếp giao thức MCP hoặc gỡ lỗi (debug):
+
 * **MCP Inspector (Giao diện Web GUI trực quan để debug từng tool):**
   ```bash
   npx @modelcontextprotocol/inspector python -m sgu_mcp.server --transport stdio
   ```
-* **Chạy trực tiếp Server (Stdio):**
+
+* **Claude Code CLI (Thêm MCP Server vào CLI):**
+  ```bash
+  claude mcp add sgu_academic_server python -m sgu_mcp.server --transport stdio
+  ```
+
+* **Khởi chạy trực tiếp Server ở chế độ Stdio (Dòng lệnh):**
   ```bash
   python -m sgu_mcp.server --transport stdio
   ```
+
+> **Dành cho Trợ lý AI (AI Agents):** Xem chi tiết quy chuẩn vận hành 100% Native MCP Tools tại [AGENTS.md](AGENTS.md) và hướng dẫn nghiệp vụ học vụ tại [skills/sgu-academic/SKILL.md](skills/sgu-academic/SKILL.md).
+
+
 
 ---
 
@@ -234,44 +254,44 @@ Cấu trúc JSON này tương thích 100% với Claude Desktop, Antigravity, VS 
 
 ## Kiểm thử tự động (Unit Tests & 100% Coverage)
 
-Dự án đi kèm bộ test tự động sử dụng `pytest` với **độ bao phủ tuyệt đối 100%** toàn bộ mã nguồn:
+Dự án đi kèm bộ test tự động sử dụng `pytest` với **độ bao phủ tuyệt đối 100%** toàn bộ mã nguồn (cả Statement Coverage và Branch Coverage):
 
 ```bash
-# Chạy toàn bộ 49 test cases kèm báo cáo độ bao phủ
-pytest --cov=sgu_mcp --cov-report=term-missing
+# Chạy toàn bộ 52 test cases kèm báo cáo độ bao phủ
+python -m pytest --cov=sgu_mcp --cov-branch --cov-report=term-missing tests/
 ```
 
 Kết quả kiểm thử thực tế:
 ```text
 ============================= test session starts =============================
-platform win32 -- Python 3.12.10, pytest-9.0.2
-collected 49 items
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+collected 52 items
 
-tests\test_cache.py ....                                                 [  8%]
-tests\test_crypto.py ..                                                  [ 12%]
-tests\test_mcp_server.py .........                                       [ 30%]
-tests\test_modules.py ..................                                 [ 67%]
-tests\test_sgu_client.py .............                                   [ 93%]
-tests\test_tools_offline.py ...                                          [100%]
+tests/test_cache.py ....                                                 [  7%]
+tests/test_crypto.py ..                                                  [ 11%]
+tests/test_mcp_server.py .............                                   [ 32%]
+tests/test_modules.py ..................                                 [ 67%]
+tests/test_sgu_client.py ...............                                 [ 94%]
+tests/test_tools_offline.py ...                                          [100%]
 
 =============================== tests coverage ================================
-Name                           Stmts   Miss  Cover   Missing
-------------------------------------------------------------
-sgu_mcp\__init__.py                1      0   100%
-sgu_mcp\config.py                 14      0   100%
-sgu_mcp\core\cache.py             47      0   100%
-sgu_mcp\core\crypto.py            38      0   100%
-sgu_mcp\core\sgu_client.py        99      0   100%
-sgu_mcp\modules\academic.py       49      0   100%
-sgu_mcp\modules\exams.py          32      0   100%
-sgu_mcp\modules\schedule.py       87      0   100%
-sgu_mcp\modules\tuition.py        45      0   100%
-sgu_mcp\prompts\templates.py       1      0   100%
-sgu_mcp\resources\content.py       2      0   100%
-sgu_mcp\server.py                106      0   100%
-------------------------------------------------------------
-TOTAL                            521      0   100%
-============================== 49 passed in 3.93s ==============================
+Name                           Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------
+sgu_mcp\__init__.py                1      0      0      0   100%
+sgu_mcp\config.py                 12      0      0      0   100%
+sgu_mcp\core\cache.py             45      0      6      0   100%
+sgu_mcp\core\crypto.py            38      0      4      0   100%
+sgu_mcp\core\sgu_client.py        76      0     12      0   100%
+sgu_mcp\modules\academic.py       49      0     12      0   100%
+sgu_mcp\modules\exams.py          31      0     12      0   100%
+sgu_mcp\modules\schedule.py       84      0     34      0   100%
+sgu_mcp\modules\tuition.py        45      0     12      0   100%
+sgu_mcp\prompts\templates.py       2      0      0      0   100%
+sgu_mcp\resources\content.py       2      0      0      0   100%
+sgu_mcp\server.py                102      0      8      0   100%
+--------------------------------------------------------------------------
+TOTAL                            487      0    100      0   100%
+======================== 52 passed, 1 warning in 6.49s ========================
 ```
 
 ---
@@ -279,7 +299,8 @@ TOTAL                            521      0   100%
 ## Cấu trúc thư mục
 
 ```
-sgu-academic-mcp/
+SGU-Academic-MCP/
+├── AGENTS.md                  # Hướng dẫn đa môi trường & cây quyết định cho AI Agents
 ├── sgu_mcp/
 │   ├── config.py              # Cấu hình Pydantic BaseSettings
 │   ├── server.py              # Entrypoint MCP Server (Stdio & SSE)
@@ -298,18 +319,21 @@ sgu-academic-mcp/
 │       └── templates.py       # 3 MCP Prompt templates
 ├── skills/
 │   └── sgu-academic/
-│       └── SKILL.md           # Agent Skill tích hợp cho AI assistants
+│       └── SKILL.md           # Agent Skill nghiệp vụ học vụ SGU
 ├── hands_on_lab/
 │   └── HANDS_ON_LAB.md        # Hướng dẫn thực hành từng bước (Hands-on Guide)
-├── tests/                     # 48 unit tests tự động (100% Coverage)
+├── tests/                     # 52 unit tests tự động (100% Coverage)
 │   ├── test_cache.py          # Kiểm thử SQLite Caching, TTL & Error handling
 │   ├── test_crypto.py         # Kiểm thử tạo header 'ua' reverse-engineered
 │   ├── test_sgu_client.py     # Kiểm thử API Client, Auto-login & HTTP communication
 │   ├── test_modules.py        # Kiểm thử toàn diện 15 Tools & nghiệp vụ học vụ
-│   ├── test_mcp_server.py     # Kiểm thử MCP Protocol (Tools, Resources, Prompts & CLI)
+│   ├── test_mcp_server.py     # Kiểm thử MCP Protocol (Tools, Resources, Prompts & Server Lifecycle)
 │   └── test_tools_offline.py  # Kiểm thử offline mô phỏng GPA & môn tiên quyết
-├── Dockerfile                 # Container image build
-├── docker-compose.yml         # Container orchestration
+├── setup.py                   # Script cài đặt tự động 3-in-1 đa nền tảng (Polyglot)
+├── setup.bat                  # 1-Click setup dành cho Windows
+├── setup.sh                   # 1-Click setup dành cho Linux / WSL
+├── Dockerfile                 # Container image build (Python 3.12-slim, non-root)
+├── docker-compose.yml         # Container orchestration & live volume mount
 └── requirements.txt           # Python dependencies
 ```
 

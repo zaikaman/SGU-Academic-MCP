@@ -484,6 +484,13 @@ async def test_tool_check_schedule_conflict():
         assert res_no_conflict["co_trung_lich"] is False
         assert res_no_conflict["so_lop_bi_trung"] == 0
 
+        # Case 3: Different day (Wednesday / Thứ 4)
+        res_diff_day = await tool_check_schedule_conflict(
+            target_thu=4, target_tiet_bd=1, target_so_tiet=3
+        )
+        assert res_diff_day["co_trung_lich"] is False
+        assert res_diff_day["so_lop_bi_trung"] == 0
+
 
 # ==================== TUITION MODULE TESTS ====================
 

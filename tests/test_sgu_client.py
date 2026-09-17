@@ -277,3 +277,19 @@ async def test_get_student_info_no_current_student(monkeypatch):
     mock_post.assert_called_with(
         "/api/dkmh/w-locsinhvieninfo", payload={}, cache_key="student_info_current", ttl=86400
     )
+
+
+@pytest.mark.asyncio
+async def test_post_api_without_cache_key(monkeypatch):
+    client = SguApiClient()
+    client.access_token = "tok"
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {"code": 200, "data": "ok"}
+
+    with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_resp
+        res = await client._post_api("/api/test", payload={}, cache_key=None)
+        assert res == {"code": 200, "data": "ok"}
+
