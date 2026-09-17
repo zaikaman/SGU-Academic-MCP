@@ -80,7 +80,6 @@ async def test_server_resources_registration():
     assert "04 Tôn Đức Thắng" in str(campuses)
 
 
-
 @pytest.mark.asyncio
 async def test_server_prompts_registration():
     server = create_server()
