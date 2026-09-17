@@ -292,4 +292,3 @@ async def test_post_api_without_cache_key(monkeypatch):
         mock_post.return_value = mock_resp
         res = await client._post_api("/api/test", payload={}, cache_key=None)
         assert res == {"code": 200, "data": "ok"}
-

@@ -257,7 +257,6 @@ def test_main_win32_no_stdout_reconfigure(monkeypatch):
         assert mock_run.called
 
 
-
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_dunder_main(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["server.py", "--transport", "stdio"])
@@ -293,4 +292,3 @@ def test_main_non_win32(monkeypatch):
     with patch("asyncio.run", side_effect=fake_run) as mock_run:
         main()
         assert mock_run.called
-
