@@ -78,4 +78,4 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
         "canh_bao_thi_don_dap": warnings,
     }
 
-# [sinhtoluudan commit 33: docs(exams): add docstrings and typing t]
+# [zaikaman commit 34: fix exam date parsing for single digit m]
