@@ -6,6 +6,7 @@ Hỗ trợ chạy stdio (cho Claude Desktop, Cursor) và SSE (cho Web Client, Mi
 
 import argparse
 import asyncio
+import logging
 import sys
 from typing import Any
 
@@ -40,6 +41,14 @@ from sgu_mcp.modules.tuition import (
 from sgu_mcp.prompts.templates import SGU_PROMPTS
 from sgu_mcp.resources.content import SGU_RESOURCES
 
+logger = logging.getLogger("sgu_mcp.server")
+if not logger.handlers:
+    _handler = logging.StreamHandler(sys.stderr)
+    _formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] [SGU-MCP] %(message)s")
+    _handler.setFormatter(_formatter)
+    logger.addHandler(_handler)
+    logger.setLevel(logging.INFO)
+
 
 def create_server() -> MCPServer:
     """Khởi tạo và cấu hình MCP Server"""
@@ -55,6 +64,7 @@ def create_server() -> MCPServer:
         name="sgu_login", description="Đăng nhập tài khoản sinh viên vào cổng thông tin đào tạo SGU"
     )
     async def sgu_login(student_id: str, password: str) -> dict[str, Any]:
+        logger.info("Tool 'sgu_login' called for student_id: %s", student_id)
         return await tool_sgu_login(student_id=student_id, password=password)
 
     @server.tool(
@@ -62,6 +72,7 @@ def create_server() -> MCPServer:
         description="Lấy danh sách môn học đã đăng ký trong học kỳ hiện tại của sinh viên SGU",
     )
     async def get_registered_courses() -> dict[str, Any]:
+        logger.info("Tool 'get_registered_courses' called")
         return await tool_get_registered_courses()
 
     @server.tool(
@@ -69,6 +80,7 @@ def create_server() -> MCPServer:
         description="Lấy thời khóa biểu học kỳ chi tiết theo tuần của sinh viên SGU",
     )
     async def get_weekly_schedule(semester_id: str | None = None) -> dict[str, Any]:
+        logger.info("Tool 'get_weekly_schedule' called (semester_id=%s)", semester_id)
         return await tool_get_weekly_schedule(semester_id=semester_id)
 
     @server.tool(
@@ -76,6 +88,7 @@ def create_server() -> MCPServer:
         description="Tra cứu nhanh lịch học hôm nay của sinh viên (phòng học, ca học, giảng viên)",
     )
     async def get_today_schedule() -> dict[str, Any]:
+        logger.info("Tool 'get_today_schedule' called")
         return await tool_get_today_schedule()
 
     @server.tool(
@@ -85,6 +98,12 @@ def create_server() -> MCPServer:
     async def check_schedule_conflict(
         target_thu: int, target_tiet_bd: int, target_so_tiet: int
     ) -> dict[str, Any]:
+        logger.info(
+            "Tool 'check_schedule_conflict' called (thu=%d, tiet_bd=%d, so_tiet=%d)",
+            target_thu,
+            target_tiet_bd,
+            target_so_tiet,
+        )
         return await tool_check_schedule_conflict(
             target_thu=target_thu, target_tiet_bd=target_tiet_bd, target_so_tiet=target_so_tiet
         )
@@ -94,6 +113,7 @@ def create_server() -> MCPServer:
         description="Tra cứu lịch thi học kỳ chính thức từ SGU (ngày thi, phòng thi, ca thi, SBD)",
     )
     async def get_exam_schedule(semester_id: str | None = None) -> dict[str, Any]:
+        logger.info("Tool 'get_exam_schedule' called (semester_id=%s)", semester_id)
         return await tool_get_exam_schedule(semester_id=semester_id)
 
     @server.tool(
@@ -101,6 +121,7 @@ def create_server() -> MCPServer:
         description="Đếm ngược số ngày đến từng môn thi và cảnh báo lịch thi dồn dập",
     )
     async def get_exam_countdown(semester_id: str | None = None) -> dict[str, Any]:
+        logger.info("Tool 'get_exam_countdown' called (semester_id=%s)", semester_id)
         return await tool_get_exam_countdown(semester_id=semester_id)
 
     @server.tool(
@@ -108,6 +129,7 @@ def create_server() -> MCPServer:
         description="Lấy hồ sơ sinh viên chính thức từ SGU (họ tên, lớp, ngành, CVHT)",
     )
     async def get_student_profile() -> dict[str, Any]:
+        logger.info("Tool 'get_student_profile' called")
         return await tool_get_student_profile()
 
     @server.tool(
@@ -115,6 +137,7 @@ def create_server() -> MCPServer:
         description="Lấy bảng điểm học tập chi tiết của từng học kỳ từ hệ thống SGU",
     )
     async def get_semester_grades(semester_id: str | None = None) -> dict[str, Any]:
+        logger.info("Tool 'get_semester_grades' called (semester_id=%s)", semester_id)
         return await tool_get_semester_grades(semester_id=semester_id)
 
     @server.tool(
@@ -122,6 +145,7 @@ def create_server() -> MCPServer:
         description="Tổng hợp điểm GPA tích lũy, số tín chỉ đạt và các môn còn nợ",
     )
     async def calculate_gpa_summary(semester_id: str | None = None) -> dict[str, Any]:
+        logger.info("Tool 'calculate_gpa_summary' called (semester_id=%s)", semester_id)
         return await tool_calculate_gpa_summary(semester_id=semester_id)
 
     @server.tool(
@@ -131,6 +155,12 @@ def create_server() -> MCPServer:
     async def simulate_target_gpa(
         current_gpa: float, current_credits: int, target_gpa: float, remaining_credits: int
     ) -> dict[str, Any]:
+        logger.info(
+            "Tool 'simulate_target_gpa' called (current_gpa=%f, target_gpa=%f, remaining=%d)",
+            current_gpa,
+            target_gpa,
+            remaining_credits,
+        )
         return await tool_simulate_target_gpa(
             current_gpa=current_gpa,
             current_credits=current_credits,
@@ -143,6 +173,7 @@ def create_server() -> MCPServer:
         description="Tra cứu học phí từng kỳ, số tiền đã nộp và số tiền còn nợ của sinh viên SGU",
     )
     async def get_tuition_fees() -> dict[str, Any]:
+        logger.info("Tool 'get_tuition_fees' called")
         return await tool_get_tuition_fees()
 
     @server.tool(
@@ -150,6 +181,7 @@ def create_server() -> MCPServer:
         description="Lấy thông báo mới nhất từ Ban Giám hiệu và Phòng Đào tạo SGU",
     )
     async def get_sgu_notifications(limit: int = 10) -> dict[str, Any]:
+        logger.info("Tool 'get_sgu_notifications' called (limit=%d)", limit)
         return await tool_get_sgu_notifications(limit=limit)
 
     @server.tool(
@@ -157,6 +189,7 @@ def create_server() -> MCPServer:
         description="Tra cứu danh mục các lớp học phần đang mở kèm số lượng slot còn lại",
     )
     async def get_course_offerings(page: int = 1, limit: int = 20) -> dict[str, Any]:
+        logger.info("Tool 'get_course_offerings' called (page=%d, limit=%d)", page, limit)
         return await tool_get_course_offerings(page=page, limit=limit)
 
     @server.tool(
@@ -164,6 +197,7 @@ def create_server() -> MCPServer:
         description="Kiểm tra điều kiện môn học tiên quyết ngành CNTT trường Đại học Sài Gòn",
     )
     async def check_prerequisites(course_name: str) -> dict[str, Any]:
+        logger.info("Tool 'check_prerequisites' called for course: %s", course_name)
         return await tool_check_prerequisites(course_name=course_name)
 
     # ==================== ĐĂNG KÝ 4 MCP RESOURCES ====================
