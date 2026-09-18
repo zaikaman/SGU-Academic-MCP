@@ -78,4 +78,4 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
         "canh_bao_thi_don_dap": warnings,
     }
 
-# [toansiuuu commit 35: test(exams): add test cases for exam cou]
+# [zaikaman commit 36: address review feedback from @toansiuuu]
