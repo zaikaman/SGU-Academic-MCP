@@ -78,4 +78,4 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
         "canh_bao_thi_don_dap": warnings,
     }
 
-# [toansiuuu commit 30: feat(exams): implement get_exam_countdow]
+# [zaikaman commit 31: feat(exams): add urgent exam alerts for ]
