@@ -78,4 +78,4 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
         "canh_bao_thi_don_dap": warnings,
     }
 
-# [sinhtoluudan commit 29: feat(exams): implement get_exam_schedule]
+# [toansiuuu commit 30: feat(exams): implement get_exam_countdow]
