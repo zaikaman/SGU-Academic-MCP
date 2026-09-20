@@ -142,4 +142,4 @@ async def tool_check_prerequisites(course_name: str) -> dict[str, Any]:
         "thong_bao": f"Để đăng ký môn '{found_key}', sinh viên SGU bắt buộc phải tích lũy đạt các môn sau: {', '.join(prereqs)}.",
     }
 
-# [toansiuuu commit 52: fix prerequisite recursion check on circ]
+# [zaikaman commit 53: add type annotations and docstrings acro]
