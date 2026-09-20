@@ -141,3 +141,5 @@ async def tool_check_prerequisites(course_name: str) -> dict[str, Any]:
         "mon_tien_quyet": prereqs,
         "thong_bao": f"Để đăng ký môn '{found_key}', sinh viên SGU bắt buộc phải tích lũy đạt các môn sau: {', '.join(prereqs)}.",
     }
+
+# [sinhtoluudan commit 46: feat(tuition): implement get_tuition_fee]
