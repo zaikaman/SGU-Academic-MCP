@@ -299,4 +299,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# [sinhtoluudan commit 60: feat(server): register schedule and cour]
+# [zaikaman commit 61: feat(server): register exam and grade ca]
