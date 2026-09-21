@@ -299,4 +299,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# [zaikaman commit 64: refactor(server): wrap tool execution wi]
+# [toansiuuu commit 65: fix tool input validation error messages]
