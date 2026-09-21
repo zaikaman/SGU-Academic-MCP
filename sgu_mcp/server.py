@@ -299,4 +299,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# [toansiuuu commit 62: feat(server): register tuition and notif]
+# [sinhtoluudan commit 63: feat(server): register dynamic system pr]
