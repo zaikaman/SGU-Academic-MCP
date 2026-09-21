@@ -299,4 +299,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# [zaikaman commit 61: feat(server): register exam and grade ca]
+# [toansiuuu commit 62: feat(server): register tuition and notif]
