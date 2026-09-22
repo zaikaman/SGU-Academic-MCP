@@ -626,4 +626,4 @@ async def test_tool_get_course_offerings():
         res_none = await tool_get_course_offerings()
         assert res_none["so_lop_tra_ve"] == 0
 
-# [toansiuuu commit 73: test: fix failing assertion in gpa summa]
+# [toansiuuu commit 74: test: expand test cases for edge cases a]
