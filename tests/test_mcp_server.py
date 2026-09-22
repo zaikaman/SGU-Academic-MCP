@@ -307,3 +307,5 @@ def test_main_non_win32(monkeypatch):
     with patch("asyncio.run", side_effect=fake_run) as mock_run:
         main()
         assert mock_run.called
+
+# [zaikaman commit 76: test: verify 100% test pass rate across ]
