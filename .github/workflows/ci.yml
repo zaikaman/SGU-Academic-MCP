@@ -168,3 +168,5 @@ jobs:
 
           docker logs mcp-ci-test
           docker stop mcp-ci-test
+
+# [zaikaman commit 85: ci: fix python version matrix in github ]
