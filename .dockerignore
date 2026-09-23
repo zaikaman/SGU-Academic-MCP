@@ -1,0 +1,57 @@
+# Version control
+.git
+.gitignore
+
+# Environment & Secrets (Không bao giờ copy thông tin nhạy cảm vào image)
+.env
+.env.*
+!.env.example
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+
+# Data & SQLite Cache (mount qua volume /app/data)
+data/
+*.db
+*.sqlite3
+
+# IDE & Editor configs
+.vscode/
+.cursor/
+.idea/
+
+# Documentation & PDF files
+*.pdf
+
+# Scripts & temporary files
+test_*.py
+demo.py
+setup.bat
