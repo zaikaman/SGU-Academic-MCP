@@ -359,3 +359,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# [zaikaman commit 91: feat(setup): support auto-detecting Anti]
