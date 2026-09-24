@@ -220,4 +220,4 @@ async def tool_check_schedule_conflict(
         "danh_sach_trung": conflicts,
     }
 
-# [zaikaman commit 26: feat(schedule): add get_registered_cours]
+# [zaikaman commit 96: refactor(schedule): handle fallback when]
