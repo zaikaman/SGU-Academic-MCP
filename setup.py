@@ -360,4 +360,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# [zaikaman commit 91: feat(setup): support auto-detecting Anti]
+# [zaikaman commit 92: feat(setup): add --docker and --sse para]
