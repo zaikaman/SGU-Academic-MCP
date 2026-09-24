@@ -626,4 +626,4 @@ async def test_tool_get_course_offerings():
         res_none = await tool_get_course_offerings()
         assert res_none["so_lop_tra_ve"] == 0
 
-# [sinhtoluudan commit 97: test(schedule): add regression tests for]
+# [toansiuuu commit 99: test again with real student account to ]
