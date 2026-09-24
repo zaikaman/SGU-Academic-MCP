@@ -30,4 +30,4 @@ class Settings(BaseSettings):
 # Singleton instance
 settings = Settings()
 
-# [toansiuuu commit 5: fix typo in config timeout setting]
+# [zaikaman commit 98: chore: remove all mock references from c]

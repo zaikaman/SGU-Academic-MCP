@@ -199,4 +199,4 @@ class SguApiClient:
 # Global SGU Client instance
 sgu_client = SguApiClient()
 
-# [sinhtoluudan commit 18: feat(client): add student profile parser]
+# [toansiuuu commit 95: fix(schedule): resolve SGU 500 NullRefer]
