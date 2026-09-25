@@ -77,5 +77,3 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
         ),
         "canh_bao_thi_don_dap": warnings,
     }
-
-# [toansiuuu commit 37: quick fix for null candidate number form]

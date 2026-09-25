@@ -230,5 +230,3 @@ Sinh viên phải đạt một trong các chứng chỉ ngoại ngữ sau đây 
 - Trường thực hành sư phạm và cơ sở thực tập giảng dạy của sinh viên khối Sư phạm SGU.""",
     },
 }
-
-# [zaikaman commit 105: refactor(resources): update academic gra]

@@ -359,5 +359,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# [toansiuuu commit 108: refactor: enhance Docker support in setu]

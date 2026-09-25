@@ -156,5 +156,3 @@ async def tool_simulate_target_gpa(
             else f"Mục tiêu KHÔNG KHẢ THI về mặt toán học (cần đạt {round(required_avg_gpa, 2)} > 4.0). Bạn nên cân nhắc học cải thiện các môn điểm thấp."
         ),
     }
-
-# [zaikaman commit 43: refactor(academic): align graduation hon]

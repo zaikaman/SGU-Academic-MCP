@@ -219,5 +219,3 @@ async def tool_check_schedule_conflict(
         "so_lop_bi_trung": len(conflicts),
         "danh_sach_trung": conflicts,
     }
-
-# [zaikaman commit 96: refactor(schedule): handle fallback when]

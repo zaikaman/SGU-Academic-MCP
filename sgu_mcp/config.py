@@ -29,5 +29,3 @@ class Settings(BaseSettings):
 
 # Singleton instance
 settings = Settings()
-
-# [zaikaman commit 98: chore: remove all mock references from c]

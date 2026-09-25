@@ -298,5 +298,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# [zaikaman commit 106: feat: add logging for tool calls in serv]
