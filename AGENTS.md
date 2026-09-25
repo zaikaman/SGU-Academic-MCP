@@ -89,3 +89,5 @@ Toàn bộ tài liệu chi tiết về nghiệp vụ, 4 MCP Resources, 3 Prompts
 - **[skills/sgu-academic/SKILL.md](file:///c:/Users/zaika/OneDrive/Desktop/SGU-Academic-MCP/skills/sgu-academic/SKILL.md)**
 
 Khi hỗ trợ sinh viên về học vụ, Agent hãy tuân thủ hướng dẫn trong file Skill trên!
+
+<!-- [zaikaman commit 109] -->
