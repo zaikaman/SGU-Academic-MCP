@@ -106,3 +106,5 @@ exclude_lines = [
     "raise NotImplementedError",
     "pass",
 ]
+
+# [zaikaman commit 111: chore(release): bump version to v1.0.0 a]
