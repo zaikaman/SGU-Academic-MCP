@@ -85,5 +85,3 @@ Kích hoạt khi người dùng (sinh viên hoặc giảng viên SGU) yêu cầu
    - **Học phí:** Nếu còn nợ học phí $\rightarrow$ Nhắc nhở số tiền nợ và khuyến nghị thanh toán sớm để tránh bị hủy môn hoặc cấm thi.
 3. **Tư vấn thực tế về GPA:**
    - Nếu kết quả mô phỏng GPA cho thấy điểm trung bình cần đạt $> 4.0$ (bất khả thi) $\rightarrow$ Khuyên sinh viên thực tế: nên đăng ký học cải thiện các môn bị điểm C, D để kéo GPA lên thay vì chỉ trông chờ vào các môn mới mở.
-
-<!-- [zaikaman commit 105] -->

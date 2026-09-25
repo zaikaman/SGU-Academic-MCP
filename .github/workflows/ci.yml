@@ -168,5 +168,3 @@ jobs:
 
           docker logs mcp-ci-test
           docker stop mcp-ci-test
-
-# [toansiuuu commit 87: fix(ci): fix pip cache key in ci workflo]

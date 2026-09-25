@@ -83,5 +83,3 @@ class SguCache:
                 conn.commit()
         except Exception:
             pass
-
-# [toansiuuu commit 13: clean up debug print statements]
