@@ -223,10 +223,22 @@ Sinh viên phải đạt một trong các chứng chỉ ngoại ngữ sau đây 
 - Vai trò: Cơ sở đào tạo dành cho Khoa Giáo dục Tiểu học, Khoa Giáo dục Mầm non.
 - Quy tắc mã phòng: [3].[Khu][Tầng][Số phòng] (ví dụ: 3.A101).
 
-5. Ký túc xá SGU: 99 An Dương Vương, Phường Phú Định (Phường 16 cũ), Quận 8, TP.HCM.
+5. Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định (Địa điểm liên kết SGU):
+- Địa chỉ: Khu Đô Thị Nam Thành Phố, Xã Bình Hưng, Huyện Bình Chánh, TP.HCM.
+- Vai trò: Địa điểm học tập và huấn luyện tập trung toàn bộ các học phần Giáo dục Quốc phòng - An ninh (GDQP&AN I, II, III, IV) và một số học phần Giáo dục Thể chất của sinh viên SGU.
+- Quy tắc mã phòng trên Thời khóa biểu SGU: Tiền tố [Ph 4.] hoặc [4.] hoặc chứa mã [S_QP] (ví dụ: Ph 4.S_QP01, 4.S_QP02, Ph 4...).
+
+6. Ký túc xá SGU: 99 An Dương Vương, Phường Phú Định (Phường 16 cũ), Quận 8, TP.HCM.
 - Khu nội trú khang trang dành cho sinh viên xa nhà, tích hợp phòng tự học, sân thể thao và canteen.
 
-6. Trường Trung học Thực hành Sài Gòn (trực thuộc SGU): 220 Trần Bình Trọng, Phường Chợ Quán, Quận 5, TP.HCM.
-- Trường thực hành sư phạm và cơ sở thực tập giảng dạy của sinh viên khối Sư phạm SGU.""",
+7. Trường Trung học Thực hành Sài Gòn (trực thuộc SGU): 220 Trần Bình Trọng, Phường Chợ Quán, Quận 5, TP.HCM.
+- Trường thực hành sư phạm và cơ sở thực tập giảng dạy của sinh viên khối Sư phạm SGU.
+
+BẢNG TỔNG KẾT QUY TẮC GIẢI MÃ PHÒNG HỌC & CƠ SỞ ĐÀO TẠO CHO TRỢ LÝ AI:
+- [C.*], [C_*], [PM.*], Dãy A, B, C, D, E, HB, NT -> Cơ sở chính (273 An Dương Vương, Q.5).
+- [1.*], [1_*], [BHTQ.*] -> Cơ sở 1 (105 Bà Huyện Thanh Quan, Q.3).
+- [2.*], [2_*], [TĐT.*] -> Cơ sở 2 (04 Tôn Đức Thắng, Q.1).
+- [3.*], [3_*] -> Cơ sở 3 (20 Ngô Thời Nhiệm, Q.3).
+- [Ph 4.*], [4.*], [S_QP*], các môn GDQP&AN / GDTC liên kết -> Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định.""",
     },
 }

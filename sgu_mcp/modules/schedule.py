@@ -10,6 +10,77 @@ from typing import Any
 from sgu_mcp.core.sgu_client import sgu_client
 
 
+def resolve_campus(room_str: str | None) -> str:
+    """
+    Xác định cơ sở đào tạo dựa trên mã phòng học SGU:
+    - Ph 4.* / 4.* / S_QP* -> Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định
+    - C.* / PM.* -> Cơ sở chính (273 An Dương Vương, Q.5)
+    - 1.* / BHTQ.* -> Cơ sở 1 (105 Bà Huyện Thanh Quan, Q.3)
+    - 2.* / TĐT.* -> Cơ sở 2 (04 Tôn Đức Thắng, Q.1)
+    - 3.* -> Cơ sở 3 (20 Ngô Thời Nhiệm, Q.3)
+    """
+    if not room_str:
+        return "Chưa xác định"
+
+    clean = room_str.strip()
+    clean = re.sub(r"^(phòng|ph\.|ph)\s*", "", clean, flags=re.IGNORECASE).strip()
+
+    if not clean:
+        return "Chưa xác định"
+
+    upper = clean.upper()
+
+    if any(w in upper for w in ["CHƯA", "CHỜ", "TRỐNG"]):
+        return "Chưa xác định"
+
+    # 1. Trường PTNK TDTT Nguyễn Thị Định: tiền tố 4.*, 4_*, S_QP*, QP, Nguyễn Thị Định
+    if (
+        upper.startswith("4.")
+        or upper.startswith("4_")
+        or upper.startswith("4")
+        or "S_QP" in upper
+        or "QP" in upper
+        or "NGUYỄN THỊ ĐỊNH" in upper
+        or "NGUYEN THI DINH" in upper
+    ):
+        return "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+
+    # 2. Cơ sở 1: tiền tố 1.*, 1_*, BHTQ.*
+    if (
+        upper.startswith("1.")
+        or upper.startswith("1_")
+        or upper.startswith("BHTQ")
+        or bool(re.match(r"^1[A-Z0-9]", upper))
+    ):
+        return "Cơ sở 1 (105 Bà Huyện Thanh Quan, Q.3)"
+
+    # 3. Cơ sở 2: tiền tố 2.*, 2_*, TĐT.*, TDT.*
+    if (
+        upper.startswith("2.")
+        or upper.startswith("2_")
+        or upper.startswith("TĐT")
+        or upper.startswith("TDT")
+        or bool(re.match(r"^2[A-Z0-9]", upper))
+    ):
+        return "Cơ sở 2 (04 Tôn Đức Thắng, Q.1)"
+
+    # 4. Cơ sở 3: tiền tố 3.*, 3_*
+    if upper.startswith("3.") or upper.startswith("3_") or bool(re.match(r"^3[A-Z0-9]", upper)):
+        return "Cơ sở 3 (20 Ngô Thời Nhiệm, Q.3)"
+
+    # 5. Cơ sở chính: C.*, C_*, PM.*, hoặc C theo sau bởi chữ/số (C.E603, C.HB406, CA203, CHB406) hoặc dãy nhà A, B, C, D, E, HB, NT
+    if (
+        upper.startswith("C.")
+        or upper.startswith("C_")
+        or upper.startswith("PM")
+        or bool(re.match(r"^C[A-Z0-9]", upper))
+        or bool(re.match(r"^(A|B|D|E|HB|NT)[\._\d]", upper))
+    ):
+        return "Cơ sở chính (273 An Dương Vương, Q.5)"
+
+    return "Chưa xác định"
+
+
 def parse_tkb_string(tkb_str: str) -> list[dict[str, Any]]:
     """
     Bóc tách chuỗi thời khóa biểu dạng SGU:
@@ -57,6 +128,7 @@ def parse_tkb_string(tkb_str: str) -> list[dict[str, Any]]:
                 "tiet_ket_thuc": tkt,
                 "so_tiet": st,
                 "phong": phong_part,
+                "co_so": resolve_campus(phong_part),
                 "giang_vien": gv_part,
                 "thoi_gian": date_part,
             }
@@ -133,6 +205,7 @@ async def tool_get_weekly_schedule(semester_id: str | None = None) -> dict[str, 
                         "tiet_bat_dau": s.get("tiet_bat_dau"),
                         "tiet_ket_thuc": s.get("tiet_ket_thuc"),
                         "phong": s.get("phong"),
+                        "co_so": s.get("co_so") or resolve_campus(s.get("phong", "")),
                         "giang_vien": s.get("giang_vien"),
                         "thoi_gian": s.get("thoi_gian"),
                     }

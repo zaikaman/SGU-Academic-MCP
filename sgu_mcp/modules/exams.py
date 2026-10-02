@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any
 
 from sgu_mcp.core.sgu_client import sgu_client
+from sgu_mcp.modules.schedule import resolve_campus
 
 
 async def tool_get_exam_schedule(semester_id: str | None = None) -> dict[str, Any]:
@@ -14,7 +15,13 @@ async def tool_get_exam_schedule(semester_id: str | None = None) -> dict[str, An
     Tra cứu lịch thi học kỳ chính thức của sinh viên từ hệ thống đào tạo SGU.
     Bao gồm: Môn thi, ngày thi, giờ thi, ca thi, phòng thi, hình thức thi và số báo danh (SBD).
     """
-    return await sgu_client.get_exam_schedule(semester_id=semester_id)
+    res = await sgu_client.get_exam_schedule(semester_id=semester_id)
+    if isinstance(res, dict) and isinstance(res.get("data"), list):
+        for item in res["data"]:
+            if isinstance(item, dict):
+                room = item.get("phong_thi") or item.get("ten_phong")
+                item["co_so"] = resolve_campus(room)
+    return res
 
 
 async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, Any]:
@@ -34,6 +41,7 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
     for exam in exam_list:
         date_str = exam.get("ngay_thi") or exam.get("ngay")
         exam_name = exam.get("ten_mon") or exam.get("ten_mon_hoc") or "Không rõ tên môn"
+        room_name = exam.get("phong_thi") or exam.get("ten_phong")
 
         days_left = None
         if date_str:
@@ -52,7 +60,8 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
             "ten_mon": exam_name,
             "ngay_thi": date_str,
             "gio_thi": exam.get("gio_thi") or exam.get("tiet_bat_dau"),
-            "phong_thi": exam.get("phong_thi") or exam.get("ten_phong"),
+            "phong_thi": room_name,
+            "co_so": resolve_campus(room_name),
             "hinh_thuc": exam.get("hinh_thuc_thi"),
             "so_ngay_con_lai": days_left,
         }

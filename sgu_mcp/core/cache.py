@@ -24,6 +24,7 @@ class SguCache:
         except (sqlite3.OperationalError, PermissionError, OSError):
             try:
                 import tempfile
+
                 self.db_path = os.path.join(tempfile.gettempdir(), "sgu_cache.db")
                 os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
                 self._init_db()
