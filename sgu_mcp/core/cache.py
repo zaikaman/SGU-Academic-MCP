@@ -17,8 +17,20 @@ class SguCache:
 
     def __init__(self, db_path: str = "./data/sgu_cache.db"):
         self.db_path = db_path
-        os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
-        self._init_db()
+        self._disabled = False
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
+            self._init_db()
+        except (sqlite3.OperationalError, PermissionError, OSError):
+            try:
+                import tempfile
+                self.db_path = os.path.join(tempfile.gettempdir(), "sgu_cache.db")
+                os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
+                self._init_db()
+            except Exception:
+                # Nếu toàn bộ hệ thống file bị khóa quyền ghi, chuyển sang chế độ vô hiệu hóa cache
+                # để server vẫn khởi động và hoạt động 100% bình thường (gọi API trực tiếp)
+                self._disabled = True
 
     def _init_db(self):
         with sqlite3.connect(self.db_path) as conn:
@@ -35,6 +47,8 @@ class SguCache:
 
     def get(self, key: str) -> Any | None:
         """Lấy dữ liệu từ cache nếu chưa hết hạn"""
+        if getattr(self, "_disabled", False):
+            return None
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
@@ -57,6 +71,8 @@ class SguCache:
 
     def set(self, key: str, data: Any, ttl_seconds: int = 3600):
         """Lưu dữ liệu vào cache"""
+        if getattr(self, "_disabled", False):
+            return
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
@@ -73,6 +89,8 @@ class SguCache:
 
     def clear(self, key: str | None = None):
         """Xóa một key hoặc xóa toàn bộ cache"""
+        if getattr(self, "_disabled", False):
+            return
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()

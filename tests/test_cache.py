@@ -68,3 +68,45 @@ def test_cache_exceptions(tmp_path, monkeypatch):
 
     # clear all should catch exception and pass
     cache.clear()
+
+
+def test_cache_init_fallback(monkeypatch, tmp_path):
+    import sqlite3
+
+    call_count = 0
+    original_connect = sqlite3.connect
+
+    def faulty_connect(database, *args, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        # Lần đầu tiên connect vào path chỉ định thì giả lập lỗi permission
+        if call_count == 1:
+            raise sqlite3.OperationalError("unable to open database file")
+        return original_connect(database, *args, **kwargs)
+
+    monkeypatch.setattr(sqlite3, "connect", faulty_connect)
+
+    bad_path = str(tmp_path / "bad" / "cache.db")
+    cache = SguCache(db_path=bad_path)
+
+    # Đảm bảo cache đã tự động fallback và vẫn hoạt động bình thường
+    assert cache._disabled is False
+    assert cache.db_path != bad_path
+    cache.set("test_fallback", {"ok": True})
+    assert cache.get("test_fallback") == {"ok": True}
+
+
+def test_cache_init_all_fail_graceful(monkeypatch):
+    import sqlite3
+
+    def fail_connect(*args, **kwargs):
+        raise sqlite3.OperationalError("Total FS failure")
+
+    monkeypatch.setattr(sqlite3, "connect", fail_connect)
+
+    cache = SguCache(db_path="/invalid/nonexistent/db.db")
+    # Phải kích hoạt chế độ _disabled thay vì crash
+    assert cache._disabled is True
+    assert cache.get("any") is None
+    cache.set("any", 123)
+    cache.clear()
