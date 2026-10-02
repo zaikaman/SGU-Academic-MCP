@@ -23,6 +23,7 @@ from sgu_mcp.modules.exams import (
 )
 from sgu_mcp.modules.schedule import (
     parse_tkb_string,
+    resolve_campus,
     tool_check_schedule_conflict,
     tool_get_registered_courses,
     tool_get_today_schedule,
@@ -306,6 +307,58 @@ def test_parse_tkb_string():
 
     assert sessions[2]["thu_so"] == 0
     assert sessions[2]["so_tiet"] == 0
+    assert sessions[0]["co_so"] == "Cơ sở chính (273 An Dương Vương, Q.5)"
+
+
+def test_resolve_campus():
+    # Empty & invalid
+    assert resolve_campus("") == "Chưa xác định"
+    assert resolve_campus(None) == "Chưa xác định"
+    assert resolve_campus("   ") == "Chưa xác định"
+    assert resolve_campus("Chưa xếp phòng") == "Chưa xác định"
+    assert resolve_campus("Phòng chưa có") == "Chưa xác định"
+
+    # Trường Phổ thông Năng khiếu TDTT Nguyễn Thị Định (Ph 4.*, 4.*, S_QP*, QP)
+    assert (
+        resolve_campus("Ph 4.S_QP01")
+        == "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+    )
+    assert (
+        resolve_campus("4.S_QP02") == "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+    )
+    assert resolve_campus("Ph 4") == "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+    assert (
+        resolve_campus("Phòng 4.A101")
+        == "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+    )
+    assert (
+        resolve_campus("S_QP01") == "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+    )
+    assert (
+        resolve_campus("GDQP Nguyễn Thị Định")
+        == "Trường Phổ thông Năng khiếu Thể dục Thể thao Nguyễn Thị Định"
+    )
+
+    # Cơ sở chính (C.*, PM.*, Dãy A, B, C, D, E, HB, NT)
+    assert resolve_campus("C.E603") == "Cơ sở chính (273 An Dương Vương, Q.5)"
+    assert resolve_campus("Ph C.HB406") == "Cơ sở chính (273 An Dương Vương, Q.5)"
+    assert resolve_campus("C.A203") == "Cơ sở chính (273 An Dương Vương, Q.5)"
+    assert resolve_campus("PM.02") == "Cơ sở chính (273 An Dương Vương, Q.5)"
+    assert resolve_campus("C.PM01") == "Cơ sở chính (273 An Dương Vương, Q.5)"
+
+    # Cơ sở 1 (1.*, BHTQ.*)
+    assert resolve_campus("1.A202") == "Cơ sở 1 (105 Bà Huyện Thanh Quan, Q.3)"
+    assert resolve_campus("Ph 1.A202") == "Cơ sở 1 (105 Bà Huyện Thanh Quan, Q.3)"
+    assert resolve_campus("BHTQ.101") == "Cơ sở 1 (105 Bà Huyện Thanh Quan, Q.3)"
+
+    # Cơ sở 2 (2.*, TĐT.*)
+    assert resolve_campus("2.B301") == "Cơ sở 2 (04 Tôn Đức Thắng, Q.1)"
+    assert resolve_campus("Ph 2.B301") == "Cơ sở 2 (04 Tôn Đức Thắng, Q.1)"
+    assert resolve_campus("TĐT.101") == "Cơ sở 2 (04 Tôn Đức Thắng, Q.1)"
+
+    # Cơ sở 3 (3.*)
+    assert resolve_campus("3.A101") == "Cơ sở 3 (20 Ngô Thời Nhiệm, Q.3)"
+    assert resolve_campus("Ph 3.A102") == "Cơ sở 3 (20 Ngô Thời Nhiệm, Q.3)"
 
 
 @pytest.mark.asyncio

@@ -21,7 +21,7 @@ Nhiệm vụ của bạn:
 1. Hãy gọi công cụ `get_weekly_schedule` để lấy lịch học chi tiết trong tuần của tôi.
 2. Xác định các khoảng thời gian trống giữa các ca học và các buổi không có lịch đến trường.
 3. Lập một thời gian biểu chi tiết gồm:
-   - Các buổi học trực tiếp trên giảng đường (ghi rõ phòng và cơ sở).
+   - Các buổi học trực tiếp trên giảng đường (ghi rõ phòng và giải mã chính xác cơ sở: C.* là Cơ sở chính 273 An Dương Vương, 1.* là Cơ sở 1 Bà Huyện Thanh Quan, 2.* là Cơ sở 2 Tôn Đức Thắng, 3.* là Cơ sở 3 Ngô Thời Nhiệm, Ph 4.* / 4.* / S_QP* là Trường PTNK TDTT Nguyễn Thị Định).
    - Khung giờ tự học/làm bài tập nhóm hợp lý.
    - Thời gian nghỉ ngơi, thể thao cân bằng sức khỏe.""",
     },
