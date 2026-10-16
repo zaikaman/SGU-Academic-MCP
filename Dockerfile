@@ -32,6 +32,7 @@ USER appuser
 # Thiết lập các biến môi trường mặc định
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    TZ=Asia/Ho_Chi_Minh \
     SGU_DB_PATH=/app/data/sgu_cache.db \
     MCP_SERVER_HOST=0.0.0.0 \
     MCP_SERVER_PORT=8000

@@ -6,6 +6,7 @@ Gọi API thật từ thongtindaotao.sgu.edu.vn
 from datetime import datetime
 from typing import Any
 
+from sgu_mcp.config import VN_TZ
 from sgu_mcp.core.sgu_client import sgu_client
 from sgu_mcp.modules.schedule import resolve_campus
 
@@ -34,7 +35,7 @@ async def tool_get_exam_countdown(semester_id: str | None = None) -> dict[str, A
     raw_data = await sgu_client.get_exam_schedule(semester_id=semester_id)
     exam_list = raw_data.get("data", []) if isinstance(raw_data.get("data"), list) else []
 
-    today = datetime.now().date()
+    today = datetime.now(VN_TZ).date()
     upcoming_exams: list[dict[str, Any]] = []
     exams_by_date: dict[str, list[str]] = {}
 
