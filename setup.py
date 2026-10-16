@@ -188,6 +188,8 @@ def detect_docker_config(project_root: Path, server_name: str) -> tuple[dict, st
             "args": [
                 "exec",
                 "-i",
+                "-e",
+                "TZ=Asia/Ho_Chi_Minh",
                 "sgu_mcp_academic_server",
                 "python",
                 "-m",
@@ -217,6 +219,8 @@ def detect_docker_config(project_root: Path, server_name: str) -> tuple[dict, st
                         "docker",
                         "exec",
                         "-i",
+                        "-e",
+                        "TZ=Asia/Ho_Chi_Minh",
                         "sgu_mcp_academic_server",
                         "python",
                         "-m",
@@ -335,6 +339,7 @@ def main():
         "env": {
             "PYTHONIOENCODING": "utf-8",
             "PYTHONUNBUFFERED": "1",
+            "TZ": "Asia/Ho_Chi_Minh",
         },
     }
 

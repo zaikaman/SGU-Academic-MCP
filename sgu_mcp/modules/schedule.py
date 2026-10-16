@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from typing import Any
 
+from sgu_mcp.config import VN_TZ
 from sgu_mcp.core.sgu_client import sgu_client
 
 
@@ -223,7 +224,7 @@ async def tool_get_today_schedule() -> dict[str, Any]:
     Tra cứu nhanh lịch học ngày HÔM NAY của sinh viên dựa trên dữ liệu đăng ký môn học thật.
     Cho biết hôm nay có môn nào, học lúc mấy giờ, phòng nào, giảng viên nào.
     """
-    today_weekday = datetime.now().weekday() + 2  # Python: 0=Mon -> SGU: 2=Thứ Hai
+    today_weekday = datetime.now(VN_TZ).weekday() + 2  # Python: 0=Mon -> SGU: 2=Thứ Hai
     weekly = await tool_get_weekly_schedule()
     day_list = weekly.get("thoi_khoa_bieu_tuan", [])
 
