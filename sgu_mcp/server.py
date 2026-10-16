@@ -47,6 +47,18 @@ if not logger.handlers:
     _formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] [SGU-MCP] %(message)s")
     _handler.setFormatter(_formatter)
     logger.addHandler(_handler)
+
+    # Nếu chạy bên trong Docker container qua docker exec (PID != 1),
+    # nhân bản log vào /proc/1/fd/2 để lệnh 'docker compose logs -f' bắt được trực tiếp thời gian thực
+    try:
+        import os
+        if os.getpid() != 1 and os.path.exists("/proc/1/fd/2") and os.access("/proc/1/fd/2", os.W_OK):
+            _docker_handler = logging.FileHandler("/proc/1/fd/2", mode="w", encoding="utf-8")
+            _docker_handler.setFormatter(_formatter)
+            logger.addHandler(_docker_handler)
+    except Exception:
+        pass
+
     logger.setLevel(logging.INFO)
 
 
