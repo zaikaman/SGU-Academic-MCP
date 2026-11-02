@@ -58,7 +58,7 @@ class SguApiClient:
 
         data = {"username": uname, "password": pwd, "grant_type": "password"}
 
-        async with httpx.AsyncClient(timeout=15.0, verify=False) as client:  # nosec B501
+        async with httpx.AsyncClient(timeout=15.0, verify=settings.verify_ssl) as client:  # nosec B501
             response = await client.post(url, data=data, headers=headers)
             res_data = response.json()
 
@@ -85,7 +85,7 @@ class SguApiClient:
         endpoint: str,
         payload: dict | None = None,
         cache_key: str | None = None,
-        ttl: int = 3600,
+        ttl: int | None = None,
     ) -> dict[str, Any]:
         """Gọi API nội bộ có xác thực và lưu bộ nhớ đệm"""
         # Kiểm tra cache trước nếu có cache_key
@@ -109,18 +109,23 @@ class SguApiClient:
         headers = self._get_headers(endpoint)
         headers["Content-Type"] = "application/json"
 
-        async with httpx.AsyncClient(timeout=20.0, verify=False) as client:  # nosec B501
+        async with httpx.AsyncClient(timeout=20.0, verify=settings.verify_ssl) as client:  # nosec B501
             response = await client.post(url, json=payload or {}, headers=headers)
             if response.status_code != 200:
+                if response.status_code == 500:
+                    err_msg = f"Cổng thông tin đào tạo SGU phản hồi mã trạng thái HTTP 500 tại thời điểm truy vấn {endpoint}."
+                else:
+                    err_msg = f"Lỗi gọi API {endpoint}: HTTP {response.status_code}"
                 return {
                     "success": False,
-                    "error": f"Lỗi gọi API {endpoint}: HTTP {response.status_code}",
+                    "error": err_msg,
+                    "status_code": response.status_code,
                     "details": response.text,
                 }
 
             result = response.json()
             if cache_key and result:
-                self.cache.set(cache_key, result, ttl_seconds=ttl)
+                self.cache.set(cache_key, result, ttl_seconds=ttl if ttl is not None else settings.cache_ttl_seconds)
 
             return result
 

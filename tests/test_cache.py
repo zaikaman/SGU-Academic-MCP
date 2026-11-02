@@ -110,3 +110,17 @@ def test_cache_init_all_fail_graceful(monkeypatch):
     assert cache.get("any") is None
     cache.set("any", 123)
     cache.clear()
+
+
+def test_cache_ttl_zero_or_negative(tmp_path):
+    """Kiểm tra quy tắc: TTL <= 0 tương ứng với tắt cache, không lưu hoặc coi như hết hạn tức thì"""
+    db_file = tmp_path / "test_cache_zero.db"
+    cache = SguCache(db_path=str(db_file))
+
+    # set với TTL = 0 (tắt cache)
+    cache.set("zero_key", {"val": 123}, ttl_seconds=0)
+    assert cache.get("zero_key") is None
+
+    # set với TTL âm
+    cache.set("neg_key", {"val": 456}, ttl_seconds=-10)
+    assert cache.get("neg_key") is None

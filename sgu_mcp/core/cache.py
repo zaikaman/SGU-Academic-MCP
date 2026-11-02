@@ -9,17 +9,23 @@ import sqlite3
 import time
 from typing import Any
 
+from sgu_mcp.config import settings
+
 
 class SguCache:
     """
     Quản lý bộ nhớ đệm SQLite cho các phản hồi API từ SGU.
+    Bảng lưu trữ chuẩn: api_cache (cache_key, data_json, updated_at, ttl_seconds).
+    Cơ chế fallback: Thử mở DB tại db_path (mặc định ./data/sgu_cache.db). Nếu gặp lỗi quyền ghi
+    (như trong Docker không mount volume có quyền), tự động fallback sang tempdir (/tmp).
+    Nếu toàn bộ hệ thống file bị khóa, chuyển sang chế độ vô hiệu hóa (_disabled = True) an toàn.
     """
 
-    def __init__(self, db_path: str = "./data/sgu_cache.db"):
-        self.db_path = db_path
+    def __init__(self, db_path: str | None = None):
+        self.db_path = db_path or settings.db_path
         self._disabled = False
         try:
-            os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
+            os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
             self._init_db()
         except (sqlite3.OperationalError, PermissionError, OSError):
             try:
@@ -47,7 +53,7 @@ class SguCache:
             conn.commit()
 
     def get(self, key: str) -> Any | None:
-        """Lấy dữ liệu từ cache nếu chưa hết hạn"""
+        """Lấy dữ liệu từ cache nếu chưa hết hạn. TTL <= 0 được tính là tắt cache hoặc đã hết hạn tức thì."""
         if getattr(self, "_disabled", False):
             return None
         try:
@@ -62,18 +68,24 @@ class SguCache:
                     return None
 
                 data_json, updated_at, ttl_seconds = row
-                # Kiểm tra TTL (nếu ttl_seconds > 0)
-                if ttl_seconds > 0 and (time.time() - updated_at) > ttl_seconds:
+                # Quy tắc TTL: ttl_seconds <= 0 nghĩa là cache bị tắt/hết hạn ngay
+                if ttl_seconds <= 0 or (time.time() - updated_at) > ttl_seconds:
                     return None
 
                 return json.loads(data_json)
         except Exception:
             return None
 
-    def set(self, key: str, data: Any, ttl_seconds: int = 3600):
-        """Lưu dữ liệu vào cache"""
+    def set(self, key: str, data: Any, ttl_seconds: int | None = None):
+        """Lưu dữ liệu vào cache. Nếu ttl_seconds <= 0, bỏ qua không lưu vì cache bị tắt."""
         if getattr(self, "_disabled", False):
             return
+        ttl = ttl_seconds if ttl_seconds is not None else settings.cache_ttl_seconds
+        if ttl <= 0:
+            # TTL=0 nghĩa là tắt cache; xóa key cũ nếu có để tránh stale data
+            self.clear(key)
+            return
+
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
@@ -82,7 +94,7 @@ class SguCache:
                     INSERT OR REPLACE INTO api_cache (cache_key, data_json, updated_at, ttl_seconds)
                     VALUES (?, ?, ?, ?)
                 """,
-                    (key, json.dumps(data, ensure_ascii=False), time.time(), ttl_seconds),
+                    (key, json.dumps(data, ensure_ascii=False), time.time(), ttl),
                 )
                 conn.commit()
         except Exception:

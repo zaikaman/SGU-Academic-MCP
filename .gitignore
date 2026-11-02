@@ -27,5 +27,42 @@ data/
 *.swp
 .cursor/
 
+# Word & PDF Documents
 *.docx
 *.pdf
+
+# Build & Distribution Artifacts
+build/
+dist/
+*.exe
+*.spec
+*.ico
+*.png
+
+# Temporary Reports, Figures & Evidence Artifacts
+evidence_images/
+figures/
+generated_evidence/
+scripts/
+
+# Helper scripts for document formatting and standalone GUI
+gui_app.py
+sgu_agent.py
+academic_goal_complete.py
+audit_full_document.py
+check_*.py
+debug_*.py
+deep_scan_*.py
+eliminate_*.py
+enforce_*.py
+export_*.py
+fast_academic_format.py
+find_*.py
+fix_*.py
+inspect_*.py
+make_clickable_lists.py
+print_*.py
+search_*.py
+standardize_*.py
+test_h1_jc.py
+update_*.py

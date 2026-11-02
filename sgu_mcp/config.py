@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     db_path: str = Field(default="./data/sgu_cache.db", alias="SGU_DB_PATH")
     cache_ttl_seconds: int = Field(default=3600, alias="SGU_CACHE_TTL")  # 1 giờ
 
+    # Bảo mật mạng & SSL/TLS Verification
+    verify_ssl: bool = Field(default=True, alias="SGU_VERIFY_SSL")
+
     # Cấu hình MCP Server
     mcp_host: str = Field(default="0.0.0.0", alias="MCP_SERVER_HOST")  # nosec B104
     mcp_port: int = Field(default=8000, alias="MCP_SERVER_PORT")
