@@ -135,28 +135,81 @@ class SguApiClient:
         cache_key = f"student_info_{self.current_student_id or 'current'}"
         return await self._post_api(endpoint, payload={}, cache_key=cache_key, ttl=86400)
 
+    async def get_semesters_list(self) -> dict[str, Any]:
+        """Lấy danh sách các học kỳ và học kỳ hiện tại theo ngày thực tế từ SGU"""
+        endpoint = "/api/sch/w-locdshockytkbuser"
+        cache_key = f"semesters_tkb_{self.current_student_id or 'current'}"
+        res = await self._post_api(endpoint, payload={}, cache_key=cache_key, ttl=86400)
+        data = res.get("data", {}) if isinstance(res, dict) else {}
+        current_hk = data.get("hoc_ky_theo_ngay_hien_tai")
+        ds_hk = data.get("ds_hoc_ky", [])
+        return {
+            "current_semester_id": str(current_hk) if current_hk else None,
+            "semesters": ds_hk,
+        }
+
     async def get_registered_courses(self) -> dict[str, Any]:
-        """Lấy danh sách môn học đã đăng ký trong kỳ của sinh viên"""
+        """Lấy danh sách môn học đã đăng ký trong kỳ của sinh viên từ cổng ĐKMH"""
         endpoint = "/api/dkmh/w-locdskqdkmhsinhvien"
         payload = {"is_CVHT": False, "is_Clear": False}
         cache_key = f"reg_courses_{self.current_student_id or 'current'}"
         return await self._post_api(endpoint, payload=payload, cache_key=cache_key, ttl=1800)
 
     async def get_weekly_schedule(self, semester_id: str | None = None) -> dict[str, Any]:
-        """Lấy thời khóa biểu học kỳ / tuần của sinh viên (lấy từ dữ liệu môn học đã đăng ký thực tế)"""
-        return await self.get_registered_courses()
+        """Lấy thời khóa biểu chi tiết theo từng tuần của sinh viên từ hệ thống Edusoft SGU"""
+        current_hk = semester_id
+        if not current_hk:
+            sem_info = await self.get_semesters_list()
+            current_hk = sem_info.get("current_semester_id") or "20261"
 
-    async def get_exam_schedule(self, semester_id: str | None = None) -> dict[str, Any]:
-        """Lấy lịch thi của sinh viên"""
+        try:
+            hk_val = int(str(current_hk).strip())
+        except (ValueError, TypeError):
+            hk_val = 20261
+
+        endpoint = "/api/sch/w-locdstkbtuanusertheohocky"
+        payload = {
+            "filter": {"hoc_ky": hk_val, "ten_hoc_ky": ""},
+            "additional": {
+                "paging": {"limit": 100, "page": 1},
+                "ordering": [{"name": None, "order_type": None}],
+            },
+        }
+        cache_key = f"weekly_schedule_{self.current_student_id or 'current'}_{hk_val}"
+        res = await self._post_api(endpoint, payload=payload, cache_key=cache_key, ttl=1800)
+        if not res or res.get("code") != 200:
+            # Fallback sang dữ liệu đăng ký môn học nếu API thời khóa biểu tuần không khả dụng
+            return await self.get_registered_courses()
+        return res
+
+    async def get_exam_schedule(
+        self, semester_id: str | None = None, is_midterm: bool = False
+    ) -> dict[str, Any]:
+        """Lấy lịch thi chính thức của sinh viên từ hệ thống khảo thí SGU"""
+        current_hk = semester_id
+        if not current_hk:
+            sem_info = await self.get_semesters_list()
+            current_hk = sem_info.get("current_semester_id") or "20261"
+
+        try:
+            hk_val = int(str(current_hk).strip())
+        except (ValueError, TypeError):
+            hk_val = 20261
+
         endpoint = "/api/epm/w-locdslichthisvtheohocky"
-        payload = {"hoc_ky": semester_id} if semester_id else {}
-        cache_key = f"exams_{self.current_student_id or 'current'}_{semester_id or 'current'}"
+        payload = {
+            "filter": {"hoc_ky": hk_val, "is_giua_ky": is_midterm},
+            "additional": {
+                "paging": {"limit": 100, "page": 1},
+                "ordering": [{"name": None, "order_type": None}],
+            },
+        }
+        cache_key = f"exams_{self.current_student_id or 'current'}_{hk_val}_{is_midterm}"
         res = await self._post_api(endpoint, payload=payload, cache_key=cache_key, ttl=3600)
         if not res or res.get("code") != 200:
-            # Fallback nếu trường chưa công bố lịch thi kỳ này
             return {
                 "success": True,
-                "data": [],
+                "data": {"ds_lich_thi": []},
                 "thong_bao": "Hiện tại Trường ĐH Sài Gòn chưa công bố lịch thi chính thức cho học kỳ hiện tại (lịch thi thường công bố vào tuần thứ 10 của học kỳ).",
             }
         return res
@@ -178,7 +231,7 @@ class SguApiClient:
         """Lấy thông báo chung từ ban quản trị SGU"""
         endpoint = "/api/web/w-locdsthongbao"
         payload = {
-            "filter": {"id": None, "is_noi_dung": True},
+            "filter": {"id": None, "is_noi_dung": True, "is_web": True},
             "additional": {
                 "paging": {"limit": limit, "page": 1},
                 "ordering": [{"name": "ngay_gui", "order_type": 1}],
