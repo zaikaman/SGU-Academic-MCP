@@ -5,7 +5,7 @@ Gọi API thật từ thongtindaotao.sgu.edu.vn và bóc tách dữ liệu chu�
 
 import re
 import unittest.mock
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from sgu_mcp.config import VN_TZ
