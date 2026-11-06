@@ -125,7 +125,11 @@ class SguApiClient:
 
             result = response.json()
             if cache_key and result:
-                self.cache.set(cache_key, result, ttl_seconds=ttl if ttl is not None else settings.cache_ttl_seconds)
+                self.cache.set(
+                    cache_key,
+                    result,
+                    ttl_seconds=ttl if ttl is not None else settings.cache_ttl_seconds,
+                )
 
             return result
 

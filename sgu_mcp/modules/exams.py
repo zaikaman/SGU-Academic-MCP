@@ -36,10 +36,14 @@ async def tool_get_exam_schedule(semester_id: str | None = None) -> dict[str, An
                 "ma_mon": item.get("ma_mon"),
                 "ten_mon": exam_name,
                 "ngay_thi": item.get("ngay_thi") or item.get("ngay"),
-                "gio_thi": item.get("gio_bat_dau") or item.get("gio_thi") or item.get("tiet_bat_dau"),
+                "gio_thi": item.get("gio_bat_dau")
+                or item.get("gio_thi")
+                or item.get("tiet_bat_dau"),
                 "tiet_bat_dau": item.get("tiet_bat_dau"),
                 "so_tiet": item.get("so_tiet"),
-                "thoi_gian_lam_bai": f"{item.get('so_phut', '')} phút" if item.get("so_phut") else None,
+                "thoi_gian_lam_bai": f"{item.get('so_phut', '')} phút"
+                if item.get("so_phut")
+                else None,
                 "phong_thi": room,
                 "co_so": resolve_campus(room),
                 "dia_diem_thi": (item.get("dia_diem_thi") or "").replace("<br>", " ").strip(),

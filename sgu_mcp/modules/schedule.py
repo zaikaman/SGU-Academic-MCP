@@ -206,7 +206,9 @@ async def tool_get_registered_courses() -> dict[str, Any]:
                 st = s.get("so_tiet", 0)
                 tkt = tbd + st - 1
                 buoi = {
-                    "thu_chu": f"Thứ {s.get('thu_kieu_so')}" if s.get("thu_kieu_so") != 8 else "Chủ Nhật",
+                    "thu_chu": f"Thứ {s.get('thu_kieu_so')}"
+                    if s.get("thu_kieu_so") != 8
+                    else "Chủ Nhật",
                     "thu_so": s.get("thu_kieu_so", 0),
                     "tiet_chu": f"tiết {tbd}->{tkt}",
                     "tiet_bat_dau": tbd,
@@ -240,7 +242,7 @@ async def tool_get_weekly_schedule(
     if isinstance(tool_get_registered_courses, (unittest.mock.AsyncMock, unittest.mock.MagicMock)):
         raw_courses = await tool_get_registered_courses()
         courses = raw_courses.get("danh_sach_mon_dang_ky", [])
-        day_schedule = {
+        day_schedule: dict[int, dict[str, Any]] = {
             2: {"thu": "Thứ Hai", "cac_mon": []},
             3: {"thu": "Thứ Ba", "cac_mon": []},
             4: {"thu": "Thứ Tư", "cac_mon": []},

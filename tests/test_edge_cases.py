@@ -236,9 +236,7 @@ async def test_tool_get_exam_countdown_non_list_and_invalid_items():
     """ds_lich_thi là dict và danh sách chứa phần tử không phải dict."""
     payload = {"ds_lich_thi": {"bat_thuong": True}, "data": {"bat_thuong": True}}
 
-    with patch(
-        "sgu_mcp.modules.exams.tool_get_exam_schedule", new_callable=AsyncMock
-    ) as mock_exam:
+    with patch("sgu_mcp.modules.exams.tool_get_exam_schedule", new_callable=AsyncMock) as mock_exam:
         mock_exam.return_value = payload
         res = await tool_get_exam_countdown()
         assert res["tong_so_mon_thi"] == 0
